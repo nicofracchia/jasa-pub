@@ -1,0 +1,24 @@
+<div class='baseModal'>
+    <div class='contenidoModal'>
+        <input type="hidden" name="modalMotivoAjusteStock_token" id="modalMotivoAjusteStock_token" value="{{ csrf_token('nuevo_motivo') }}">
+        <div class='cerrarModal' onclick="oGen.fnCerrarModal(this);">
+            <img src="{{asset('images/iconos/cancelar.svg')}}" alt='Cerrar' title='Cerrar' />
+        </div>
+        <h1>Nuevo motivo de ajuste de stock</h1>
+        <div>
+            <label for="modalMotivoAjusteStock_motivo">Motivo de ajuste</label>
+            <input type="text" id="modalMotivoAjusteStock_motivo" name="modalMotivoAjusteStock[motivo]">
+        </div>
+        <div>
+            <label for="modalMotivoAjusteStock_tipo">Tipo</label>
+            <select id="modalMotivoAjusteStock_tipo" name="modalMotivoAjusteStock[tipo]">
+                <option value='0'>Egreso</option>
+                <option value='1'>Ingreso</option>
+            </select>
+        </div>
+        <div>
+            <label><br/></label>
+            <button class="btn btnGuardar" onclick="oMotivosAjustesStock.fnGuardaMotivoModal()">Guardar</button>
+        </div>
+    </div>
+</div>

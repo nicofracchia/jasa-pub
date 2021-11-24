@@ -1,0 +1,58 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Órdenes de reparación{% endblock %}
+
+{% block rutas %}Órdenes de reparación > <span>Imágenes del artículo</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('reparaciones_ingreso', {'id': reparacion.id}) }}">Ingreso</a>
+    <a href="{{ path('reparaciones_mesa', {'id': reparacion.id}) }}">Mesa de trabajo</a>
+    <a href="{{ path('reparaciones_imagenes', {'id': reparacion.id}) }}" class="actual">Imágenes</a>
+    <a href="{{ path('reparaciones_detalle', {'id': reparacion.id}) }}">Detalles</a>
+    <a href="{{ path('reparaciones_pagos', {'id': reparacion.id}) }}">Pagos</a>
+    <a href="{{ path('reparaciones_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Imágenes del artículo</h1>
+
+    <img src="{{ qr_code_path(app.request.uri, { writer: 'svg', size: 150 }) }}" />
+
+    <form method="post" action="{{ path('reparaciones_imagenes', {'id' : reparacion.id}) }}" enctype="multipart/form-data">
+        <div>
+            <div>
+                <label for="reparacion_imagen" class="required">Seleccionar imagen</label>
+                <input type="file" id="reparacion_imagen" name="imagen" placeholder='Seleccionar imagen' required="required" />
+            </div>
+            <div></div><div></div>
+        </div>
+        <div class="botonesFormularios">
+            <a href="{{ path('reparaciones_index') }}" class='btn btnCancelar'>Cancelar</a>
+            <button class="btn btnGuardar" name='guardar' value='1'>Guardar</button>
+        </div>
+        <input type="hidden" name="_token" value="{{ csrf_token('nueva_imagen_'~reparacion.id) }}">
+    </form>
+
+    <div class='contenedorImagenes'>
+        {% for imagen in imagenes %}
+            <div class='contImg'>
+                <div class='imagen'>
+                    <img src="{{asset(rutaImagenes~imagen)}}" alt="" />
+                </div>
+                <div class='accionesTop'>
+                    <a href="{{asset(rutaImagenes~imagen)}}" title='Abrir en pestaña nueva' target='_blank'>
+                        <img src="{{asset('images/iconos/tamano_normal.svg')}}" alt="" />
+                    </a>
+                    <a href="{{ path('reparaciones_imagenes_borrar', {'id': reparacion.id, 'imagen': imagen}) }}" title='Eliminar imagen'>
+                        <img src="{{asset('images/iconos/borrar_rojo.svg')}}" alt="" />
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            No hay imágenes para esta reparación.
+        {% endfor %}
+    </div>
+    
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Movimientos entre almacenes{% endblock %}
+
+{% block rutas %}Movimientos entre almacenes > <span>Cargar envío</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('movimientos_almacenes_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Detalles del pedido</h1>
+    <br/><p style='color:red;'>{{ mensajeError|raw }}</p><br/>
+    <table>
+        <th>Pedido realizado por</th>
+        <td>{{pedido.desde.nombre}}</td>
+        <th>para</th>
+        <td>{{pedido.hacia.nombre}}</td>
+    </table>
+    <br/><br/>
+
+    {{ include('movimientos_almacenes/_form_envios.html.twig') }}
+
+{% endblock %}

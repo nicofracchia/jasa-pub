@@ -1,0 +1,54 @@
+security:
+    encoders:
+        App\Entity\Usuarios:
+            algorithm: auto
+
+    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+    providers:
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\Usuarios
+                property: email
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            anonymous: false
+            lazy: true
+            provider: app_user_provider
+            guard:
+                authenticators:
+                    - App\Security\LoginAuthenticator
+            logout:
+                path: app_logout
+                target: app_login
+
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#firewalls-authentication
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            # switch_user: true
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+         - { path: ^/productos, roles: [ROLE_ADMIN, ROLE_PRODUCTOS]  }
+         - { path: ^/ajustes, roles: [ROLE_ADMIN, ROLE_PRODUCTOS]  }
+         - { path: ^/combos, roles: [ROLE_ADMIN, ROLE_COMBOS, ROLE_PRODUCTOS]  }
+         - { path: ^/servicios, roles: [ROLE_ADMIN, ROLE_REPARACIONES]  }
+         - { path: ^/almacenes, roles: [ROLE_ADMIN, ROLE_ALMACENES]  }
+         - { path: ^/proveedores, roles: [ROLE_ADMIN, ROLE_PROVEEDORES]  }
+         - { path: ^/clientes, roles: [ROLE_ADMIN, ROLE_CLIENTES]  }
+         - { path: ^/cotizador, roles: [ROLE_ADMIN, ROLE_COTIZACIONES]  }
+         - { path: ^/sales, roles: [ROLE_ADMIN, ROLE_VENTAS]  }
+         - { path: ^/compras, roles: [ROLE_ADMIN, ROLE_COMPRAS]  }
+         - { path: ^/categorias, roles:  [ROLE_ADMIN, ROLE_CATEGORIAS]  }
+         - { path: ^/caja, roles:  [ROLE_ADMIN, ROLE_CAJA]  }
+         - { path: ^/reparaciones, roles:  [ROLE_ADMIN, ROLE_REPARACIONES]  }
+         - { path: ^/usuarios, roles: ROLE_ADMIN  }
+         - { path: ^/reportes, roles: ROLE_ADMIN  }
+         - { path: ^/alertas, roles: ROLE_ADMIN  }
+         #- { path: ^/home, roles: [ROLE_ADMIN, ROLE_PRODUCTOS, ROLE_REPARACIONES, ROLE_ALMACENES,ROLE_PROVEEDORES, ROLE_CLIENTES, ROLE_COTIZACIONES, ROLE_VENTAS, ROLE_COMPRAS]  }
+         #- { path: ^/, roles: [ROLE_ADMIN, ROLE_PRODUCTOS, ROLE_REPARACIONES, ROLE_ALMACENES,ROLE_PROVEEDORES, ROLE_CLIENTES, ROLE_COTIZACIONES, ROLE_VENTAS, ROLE_COMPRAS]  }

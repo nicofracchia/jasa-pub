@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}MovimientosCaja{% endblock %}
+
+{% block body %}
+    <h1>MovimientosCaja</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ movimientos_caja.id }}</td>
+            </tr>
+            <tr>
+                <th>Fecha</th>
+                <td>{{ movimientos_caja.fecha ? movimientos_caja.fecha|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Movimiento</th>
+                <td>{{ movimientos_caja.movimiento }}</td>
+            </tr>
+            <tr>
+                <th>TipoMovimiento</th>
+                <td>{{ movimientos_caja.tipoMovimiento ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>Monto</th>
+                <td>{{ movimientos_caja.monto }}</td>
+            </tr>
+            <tr>
+                <th>Observaciones</th>
+                <td>{{ movimientos_caja.observaciones }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('movimientos_caja_index') }}">back to list</a>
+
+    <a href="{{ path('movimientos_caja_edit', {'id': movimientos_caja.id}) }}">edit</a>
+
+    {{ include('movimientos_caja/_delete_form.html.twig') }}
+{% endblock %}

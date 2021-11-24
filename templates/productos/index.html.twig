@@ -1,0 +1,64 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Productos{% endblock %}
+
+{% block rutas %}<span>Productos</span>{% endblock %}
+
+{% block contenido %}
+    <div class='contenedorFiltros'>
+        <div class='filtros'>
+            <form action="{{ path('productos_index') }}" method="post">
+                <input type="text" name="filtroProductos[titulo]" id="filtroProductos_titulo" placeholder="TÍTULO / NOMBRE DEL PRODUCTO" value="{{filtrosAplicados.titulo}}" style="width:15vmax;" />
+                <input type="text" name="filtroProductos[id]" id="filtroProductos_id" placeholder="ID" value="{{filtrosAplicados.id}}" style="width:5vmax;" />
+                <input type="text" name="filtroProductos[codigo_barras]" id="filtroProductos_codigo_barras" placeholder="COD. BARRAS" value="{{filtrosAplicados.codigo_barras}}" style="width:8vmax;" />
+                <button class="boton_filtros">FILTRAR</button>
+                <a href="{{ path('productos_index') }}" class='vaciarFiltros'>Restablecer Filtros</a>
+            </form>
+        </div>
+        <a href="{{ path('productos_new_manual') }}"><img src="{{asset('images/iconos/nuevo.png')}}" alt="" /></a>
+    </div>
+
+    <table class="tablaListados">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>TÍTULO</th>
+                <th>S. MIN.</th>
+                <th>S. ACT.</th>
+                <th>COSTO</th>
+                <th>%</th>
+                <th>PRECIO</th>
+                <th>ACCIONES</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for producto in productos %}
+            <tr>
+                <td>{{ producto[0].id }}</td>
+                <td>{{ producto[0].titulo }}</td>
+                <td>{{ producto[0].stockMinimo }}</td>
+                <td>{{ producto.stock }}</td>
+                <td>${{ producto[0].costo }}</td>
+                <td>{{ producto[0].porcentajeCosto }}</td>
+                <td>${{ producto[0].precioFinal }}</td>
+                <td>
+                    <a href="{{ path('productos_edit_manual', {'id': producto[0].id}) }}">
+                        <img src="{{asset('images/iconos/editar_off.png')}}" alt="" />
+                    </a>
+                    <a href="{{ path('productos_imagenes', {'id': producto[0].id}) }}" title='Imagenes'>
+                        <img src="{{asset('images/iconos/imagenes.svg')}}" alt="" />
+                    </a>
+                    <a href="{{ path('ajustes_stock_nuevo', {'id_producto': producto[0].id}) }}">
+                        <img src="{{asset('images/iconos/editar-stock_off.png')}}" alt="" />
+                    </a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="13">No se encontraron productos.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

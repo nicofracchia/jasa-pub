@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ProveedoresProductos index{% endblock %}
+
+{% block body %}
+    <h1>ProveedoresProductos index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Costo</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for proveedores_producto in proveedores_productos %}
+            <tr>
+                <td>{{ proveedores_producto.id }}</td>
+                <td>{{ proveedores_producto.costo }}</td>
+                <td>
+                    <a href="{{ path('proveedores_productos_show', {'id': proveedores_producto.id}) }}">show</a>
+                    <a href="{{ path('proveedores_productos_edit', {'id': proveedores_producto.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('proveedores_productos_new') }}">Create new</a>
+{% endblock %}

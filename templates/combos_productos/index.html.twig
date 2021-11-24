@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CombosProductos index{% endblock %}
+
+{% block body %}
+    <h1>CombosProductos index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Cantidad</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for combos_producto in combos_productos %}
+            <tr>
+                <td>{{ combos_producto.id }}</td>
+                <td>{{ combos_producto.cantidad }}</td>
+                <td>
+                    <a href="{{ path('combos_productos_show', {'id': combos_producto.id}) }}">show</a>
+                    <a href="{{ path('combos_productos_edit', {'id': combos_producto.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('combos_productos_new') }}">Create new</a>
+{% endblock %}

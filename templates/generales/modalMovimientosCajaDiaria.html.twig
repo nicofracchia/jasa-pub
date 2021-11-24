@@ -1,0 +1,24 @@
+<div class='baseModal'>
+    <div class='contenidoModal'>
+        <input type="hidden" name="modalMovimiento_token" id="modalMovimiento_token" value="{{ csrf_token('nuevo_movimiento') }}">
+        <div class='cerrarModal' onclick="oGen.fnCerrarModal(this);">
+            <img src="{{asset('images/iconos/cancelar.svg')}}" alt='Cerrar' title='Cerrar' />
+        </div>
+        <h1>Nuevo movimiento</h1>
+        <div>
+            <label for="modalMovimiento_movimiento">Movimiento</label>
+            <input type="text" id="modalMovimiento_movimiento" name="modalMovimiento[movimiento]">
+        </div>
+        <div>
+            <label for="modalMovimiento_tipo">Tipo</label>
+            <select id="modalMovimiento_tipo" name="modalMovimiento[tipo]">
+                <option value='0'>Egreso</option>
+                <option value='1'>Ingreso</option>
+            </select>
+        </div>
+        <div>
+            <label><br/></label>
+            <button class="btn btnGuardar" onclick="oMotivosAjusteStock.fnGuardaMovimientoModal()">Guardar</button>
+        </div>
+    </div>
+</div>

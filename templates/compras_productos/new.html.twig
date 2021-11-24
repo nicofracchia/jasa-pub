@@ -1,0 +1,19 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Órdenes de compra{% endblock %}
+
+{% block rutas %}Órdenes de compra > <span>Asignar productos</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('compras_edit', {'id': compra.id}) }}">Detalles de la orden</a>
+    <a href="{{ path('compras_productos', {'id': compra.id}) }}" class="actual">Productos de la orden</a>
+    <a href="{{ path('compras_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Productos de la orden</h1>
+
+    {{ include('compras_productos/_form.html.twig') }}
+{% endblock %}

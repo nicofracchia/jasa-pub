@@ -1,0 +1,49 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Clientes{% endblock %}
+
+{% block rutas %}<span>Clientes</span>{% endblock %}
+
+{% block contenido %}
+
+    <div class='filtros'>
+        <a href="{{ path('clientes_new') }}"><img src="{{asset('images/iconos/nuevo.png')}}" alt="" /></a>
+    </div>
+    <table class="tablaListados">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Razon Social</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <!-- <th>Dni</th> -->
+                <!-- <th>Mail</th> -->
+                <th>Telefono</th>
+                <!-- <th>Direccion</th> -->
+                <th>Cuenta Corriente</th>
+                <!-- <th>Habilitado</th> -->
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for cliente in clientes %}
+            <tr>
+                <td>{{ cliente.id }}</td>
+                <td>{{ cliente.razonSocial }}</td>
+                <td>{{ cliente.apellido }}</td>
+                <td>{{ cliente.nombre }}</td>
+                <td>{{ cliente.telefono }}</td>
+                <td>{{ (cliente.cuentaCorriente == 1) ? 'SI' : 'NO' }}</td>
+                <td>
+                    <a href="{{ path('clientes_edit', {'id': cliente.id}) }}"><img src="{{asset('images/iconos/editar_off.png')}}" alt="" /></a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="10">No se encontraron clientes.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

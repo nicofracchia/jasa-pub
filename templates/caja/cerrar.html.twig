@@ -1,0 +1,33 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Caja diaria{% endblock %}
+
+{% block rutas %}Caja diaria - <span>Cerrar caja</span>{% endblock %}
+
+{% block contenido %}
+    <h1>Cerrar caja</h1>
+    <form method="post" action="{{ path('caja_cerrar', {'id': caja.id}) }}">
+        <div>
+            <div>
+                <label for="caja_saldo" class="required">Saldo final estimado: ${{montoEstimado|number_format(2, ',', '.')}}</label>
+                <input type="hidden" id="caja_estimado" name="estimado" value="{{montoEstimado}}" />
+            </div>
+            <div></div><div></div>
+            <div>
+                <label for="caja_saldo" class="required">Saldo final real</label>
+                <input type="number" id="caja_saldo" name="saldo" required="required" placeholder="$" />
+            </div>
+            <div></div><div></div>
+            <div class="botonesFormularios">
+                <button class="btn btnGuardar" name='guardar' value='1'>Cerrar caja</button>
+            </div>
+            <div></div><div></div>
+            {% if (caja.inicio|date("Y-m-d") == "now"|date("Y-m-d")) %}
+                <div class="botonesFormularios">
+                    <a href='{{ path('caja_index') }}'><button class="btn btnEliminar" type="button">Cancelar</button></a>
+                </div>
+            {% endif %}
+            <input type="hidden" name="_token" value="{{ csrf_token('cerrar_caja_diaria') }}">
+        </div>
+    </form>
+{% endblock %}

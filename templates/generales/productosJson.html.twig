@@ -1,0 +1,32 @@
+<div class="filtros">
+    <form id="formulario_filtros">
+        <input type="text" name="filtroProductos[titulo]" id="filtroProductos_titulo" placeholder="TÍTULO / NOMBRE DEL PRODUCTO" value="" style="width:15vmax;">
+        <input type="text" name="filtroProductos[id]" id="filtroProductos_id" placeholder="ID" value="" style="width:5vmax;">
+        <input type="text" name="filtroProductos[codigo_barras]" id="filtroProductos_codigo_barras" placeholder="COD. BARRAS" value="" style="width:8vmax;">
+        <button type="submit" class="boton_filtros">FILTRAR</button>
+    </form>
+</div>
+
+<script>
+    const frmFiltrosAsignar = document.getElementById('formulario_filtros');
+    frmFiltrosAsignar.addEventListener('submit', function(e){
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        fetch("{{ path('productos_json') }}", {
+            method: 'post',
+            mode: 'cors',
+            credentials: 'same-origin',
+            body: formData
+        }).then(function(response){
+            //console.log('RESPONSE: ',response);
+            return response.json();
+        }).then(function(json){
+            //console.log('JSON: ', json);
+            responseFrmFiltros(json);
+        }).catch(function(error){
+            console.error('ERROR:', error);
+        })
+    });
+</script>

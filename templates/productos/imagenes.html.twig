@@ -1,0 +1,56 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Productos{% endblock %}
+
+{% block rutas %}Productos > <span>Imágenes del producto</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('productos_edit_manual', {'id': producto.id}) }}">Detalles de producto</a>
+    <a href="{{ path('productos_imagenes', {'id': producto.id}) }}" class="actual">Imágenes</a>
+    <a href="{{ path('ajustes_stock_nuevo', {'id_producto': producto.id}) }}">Ajustes de stock</a>
+    <a href="{{ path('productos_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Imágenes del producto</h1>
+
+    <img src="{{ qr_code_path(app.request.uri, { writer: 'svg', size: 150 }) }}" />
+
+    <form method="post" action="{{ path('productos_imagenes', {'id' : producto.id}) }}" enctype="multipart/form-data">
+        <div>
+            <div>
+                <label for="producto_imagen" class="required">Seleccionar imagen</label>
+                <input type="file" id="producto_imagen" name="imagen" placeholder='Seleccionar imagen' required="required" />
+            </div>
+            <div></div><div></div>
+        </div>
+        <div class="botonesFormularios">
+            <a href="{{ path('productos_index') }}" class='btn btnCancelar'>Cancelar</a>
+            <button class="btn btnGuardar" name='guardar' value='1'>Guardar</button>
+        </div>
+        <input type="hidden" name="_token" value="{{ csrf_token('nueva_imagen_'~producto.id) }}">
+    </form>
+
+    <div class='contenedorImagenes'>
+        {% for imagen in imagenes %}
+            <div class='contImg'>
+                <div class='imagen'>
+                    <img src="{{asset(rutaImagenes~imagen)}}" alt="" />
+                </div>
+                <div class='accionesTop'>
+                    <a href="{{asset(rutaImagenes~imagen)}}" title='Abrir en pestaña nueva' target='_blank'>
+                        <img src="{{asset('images/iconos/tamano_normal.svg')}}" alt="" />
+                    </a>
+                    <a href="{{ path('productos_imagenes_borrar', {'id': producto.id, 'imagen': imagen}) }}" title='Eliminar imagen'>
+                        <img src="{{asset('images/iconos/borrar_rojo.svg')}}" alt="" />
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            No hay imágenes para este producto.
+        {% endfor %}
+    </div>
+    
+{% endblock %}

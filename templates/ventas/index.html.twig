@@ -1,0 +1,99 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Ventas{% endblock %}
+
+{% block rutas %}<span>Ventas</span>{% endblock %}
+
+{% block contenido %}
+
+    {% set estadoSel = filtrosAplicados.estado ?? '' %}
+
+    <div class='contenedorFiltros'>
+        <div class='filtros'>
+            <form action="{{ path('ventas_index') }}" method="post">
+                <input type="date" name="filtroVentas[desde]" id="filtroVentas_desde" data-formateado="" onchange="setDateFormatArgentina(this);" value="{{ filtrosAplicados.desde|date("Y-m-d") }}">
+                <input type="date" name="filtroVentas[hasta]" id="filtroVentas_hasta" data-formateado="" onchange="setDateFormatArgentina(this);" value="{{ filtrosAplicados.hasta|date("Y-m-d") }}">
+                <input type="text" name="filtroVentas[vendedor]" id="filtroVentas_vendedor" placeholder="VENDEDOR" value="{{filtrosAplicados.vendedor}}" />
+                <input type="text" name="filtroVentas[cliente]" id="filtroVentas_cliente" placeholder="CLIENTE" value="{{filtrosAplicados.cliente}}" />
+                <select id="filtroVentas_estado" name="filtroVentas[estado]">
+                    <option value="">ESTADO</option>
+                    <option {{ (estadoSel == "Preventa") ? 'selected' : '' }}>Preventa</option>
+                    <option {{ (estadoSel == "Embalado") ? 'selected' : '' }}>Embalado</option>
+                    <option {{ (estadoSel == "Esperando transporte") ? 'selected' : '' }}>Esperando transporte</option>
+                    <option {{ (estadoSel == "En tránsito") ? 'selected' : '' }}>En tránsito</option>
+                    <option {{ (estadoSel == "Finalizada") ? 'selected' : '' }}>Finalizada</option>
+                </select>
+                <button class="boton_filtros">FILTRAR</button>
+                <a href="{{ path('ventas_index') }}" class='vaciarFiltros'>Restablecer Filtros</a>
+            </form>
+        </div>
+        <a href="{{ path('ventas_new') }}"><img src="{{asset('images/iconos/nuevo.png')}}" alt="" /></a>
+    </div>
+    
+
+    <table class="tablaListados">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Id</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Precio final</th>
+                <th>Cliente</th>
+                <th>Vendedor</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        
+        {% for venta in ventas %}
+            
+            {% set clienteNombre = venta.cliente.nombre ?? "" %}
+            {% set clienteApellido = venta.cliente.apellido ?? "" %}
+            {% if clienteNombre != "" and clienteApellido != "" %}
+                {% set clienteNyA = clienteApellido ~ ', ' ~ clienteNombre %}
+            {% else %}
+                {% set clienteNyA = "Anónimo" %}
+            {% endif %}
+            <tr>
+                <td><input type='checkbox' /></td>
+                <td>{{ venta.id }}</td>
+                <td>{{ venta.fecha ? venta.fecha|date('d/m/Y') : '' }}</td>
+                <td>{{ venta.estado }}</td>
+                <td>
+                    ${{ venta.precioFinal|number_format(0, ',', '.') }} 
+                </td>
+                <td>{{ clienteNyA }}</td>
+                <td>{{ venta.creador.apellido ~ ', ' ~ venta.creador.nombre }}</td>
+                <td>
+                    {% if venta.estado != 'Finalizada' %}
+                        <a href="{{ path('ventas_edit', {'id': venta.id}) }}"><img src="{{asset('images/iconos/editar_off.png')}}" alt="" /></a>
+                        <a href="{{ path('ventas_imagenes', {'id': venta.id}) }}" title='Imagenes'><img src="{{asset('images/iconos/imagenes.svg')}}" alt="" /></a>
+                        <a href="{{ path('ventas_envio', {'id': venta.id}) }}" title='Detalles de envío'><img src="{{asset('images/iconos/envio.svg')}}" alt="" /></a>
+                        <a href="{{ path('ventas_pagos', {'id': venta.id}) }}"><img src="{{asset('images/iconos/editar-pagos_off.png')}}" alt="" /></a>
+                    {% endif %}
+                    <a href="{{ path('ventas_xls', {'id': venta.id}) }}"><img src="{{asset('images/iconos/xls.png')}}" alt="" title="Exportar a excel" /></a>
+                    <a href="{{ path('ventas_pdf', {'id': venta.id}) }}" target='_blank'><img src="{{asset('images/iconos/pdf.svg')}}" alt="" title="Nota de venta" /></a>
+                    <a href="{{ path('ventas_pdf_iva', {'id': venta.id}) }}" target='_blank'><img src="{{asset('images/iconos/pdf.svg')}}" alt="" title="Nota de venta con IVA discriminado" /></a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">No se encontraron ventas.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        setDateFormatArgentina = function(el){
+            let val = el.value.split('-');
+            if(val.length > 1){
+                fechaFormateada = val[2]+'/'+val[1]+'/'+val[0];
+                el.setAttribute('data-formateado', fechaFormateada);
+            }
+        }
+        document.querySelectorAll('input[type=date]').forEach(setDateFormatArgentina);
+    </script>
+
+{% endblock %}

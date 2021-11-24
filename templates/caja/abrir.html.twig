@@ -1,0 +1,22 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Caja diaria{% endblock %}
+
+{% block rutas %}<span>Caja diaria</span>{% endblock %}
+
+{% block contenido %}
+    <h1>Abrir caja diaria</h1>
+    <form method="post" action="{{ path('caja_abrir') }}">
+        <div id="productos">
+            <div>
+                <label for="caja_saldo" class="required">Saldo inicial</label>
+                <input type="number" id="caja_saldo" name="saldo" required="required" placeholder="$" />
+            </div>
+            <div></div><div></div>
+            <div class="botonesFormularios">
+                <button class="btn btnGuardar" name='guardar' value='1'>Abrira caja</button>
+            </div>
+        </div>
+        <input type="hidden" name="_token" value="{{ csrf_token('iniciar_caja_diaria') }}">
+    </form>
+{% endblock %}

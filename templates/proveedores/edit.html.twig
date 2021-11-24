@@ -1,0 +1,21 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Proveedores{% endblock %}
+
+{% block rutas %}Proveedores > <span>Editar proveedor</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('proveedores_edit', {'id': proveedore.id}) }}" class="actual">Detalles del proveedor</a>
+    <a href="{{ path('proveedores_productos', {'id': proveedore.id}) }}">Productos del proveedor</a>
+    <a href="{{ path('proveedores_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Detalles del proveedor</h1>
+
+    {{ include('proveedores/_form.html.twig', {'button_label': 'Guardar'}) }}
+
+    {{ include('proveedores/_delete_form.html.twig') }}
+{% endblock %}

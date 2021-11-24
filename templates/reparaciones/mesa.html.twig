@@ -1,0 +1,293 @@
+{% set estadoSel = reparacion.estado ?? '' %}
+
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Órdenes de reparación{% endblock %}
+
+{% block rutas %}Órdenes de reparación > <span>Mesa de trabajo</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('reparaciones_ingreso', {'id': reparacion.id}) }}">Ingreso</a>
+    <a href="{{ path('reparaciones_mesa', {'id': reparacion.id}) }}" class="actual">Mesa de trabajo</a>
+    <a href="{{ path('reparaciones_imagenes', {'id': reparacion.id}) }}">Imágenes</a>
+    <a href="{{ path('reparaciones_detalle', {'id': reparacion.id}) }}">Detalles</a>
+    <a href="{{ path('reparaciones_pagos', {'id': reparacion.id}) }}">Pagos</a>
+    <a href="{{ path('reparaciones_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    
+    <h1>Detalles del ingreso</h1>
+    <br/><br/>
+    
+    <img src="{{ qr_code_path(app.request.uri, { writer: 'svg', size: 150 }) }}" />
+    
+    <table class='detallesMesaTrabajo'>
+        <tr>
+            <td>
+                <span>Ingresado por:</span> {{ reparacion.receptor.nombre ?? ''}} {{ reparacion.receptor.apellido ?? ''}}
+                <br/>
+                <span>Fecha:</span> {{ reparacion.recepcion ? reparacion.recepcion|date('d/m/Y') : '' }}
+                <br/>
+                <span>Hora:</span> {{ reparacion.recepcion ? reparacion.recepcion|date('H:i:s') : '' }}
+                <br/>
+                <span>Estado:</span> {{reparacion.estado ?? ''}}
+                <br/>
+                <span>Tarea:</span> {{reparacion.tarea ?? ''}}
+            </td>
+            <td>
+                <span>Artículo:</span> {{reparacion.articulo ?? ''}}
+                <br/>
+                <span>Marca:</span> {{reparacion.marca ?? ''}}
+                <br/>
+                <span>Modelo:</span> {{reparacion.modelo ?? ''}}
+                <br/>
+                <span>N° de serie:</span> {{reparacion.serial ?? ''}}
+                <br/>
+                <b>Tintas:</b>
+                <br/>
+                &nbsp;<span>C:</span> %{{reparacion.tintaC ?? '0'}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>M:</span> %{{reparacion.tintaM ?? '0'}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>Y:</span> %{{reparacion.tintaY ?? '0'}} <br/>
+                <span>CL:</span> %{{reparacion.tintaCl ?? '0'}} &nbsp;&nbsp;&nbsp;
+                <span>ML:</span> %{{reparacion.tintaMl ?? '0'}} &nbsp;&nbsp;&nbsp;
+                <span>BK:</span> %{{reparacion.tintaBk ?? '0'}} 
+            </td>
+            <td>
+                <span>Reporte:</span> {{reparacion.reporte ?? ''}}
+                <br/>
+                <span>Presupuesto inicial:</span> ${{reparacion.presupuestoInicial ? reparacion.presupuestoInicial|number_format(2, ',', '.') : ''}}
+            </td>
+        </tr>
+    </table>
+
+    <br/><br/>
+    <h1>Mesa de trabajo</h1>
+
+    <form method="post" action="{{ path('reparaciones_mesa', {'id' : reparacion.id}) }}">
+        <div>
+            {% if (mensajeError is defined) %}
+                {% if (mensajeError != '') %}
+                    <div class='mensajesError'>
+                        <ul>
+                            {% for error in mensajeError %}
+                                <li>{{error}}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            {% endif %}
+            <div>
+                <label for="reparacion_diagnostico" class="required">Diagnóstico</label>
+                <textarea id="reparacion_diagnostico" name="reparacion[diagnostico]" required="required">{{reparacion.diagnostico ?? ''}}</textarea>
+            </div>
+            <div>
+                <label for="reparacion_precio" class="required">Precio final</label>
+                <input type="number" step=".01" id="reparacion_precio" name="reparacion[precio]" required="required" value="{{reparacion.presupuestoFinal ?? ''}}" placeholder='$'/>
+            </div>
+            <div>
+                <label for="reparacion_estado" class="required">Estado</label>
+                <select id="reparacion_estado" name="reparacion[estado]" required="required">
+                    <option value="">Seleccionar...</option>
+                    <option {{ (estadoSel == 'Cancelado') ? 'selected' }}>Cancelado</option>
+                    <option {{ (estadoSel == 'En reparación') ? 'selected' }}>En reparación</option>
+                    <option {{ (estadoSel == 'Enviado a desguace') ? 'selected' }}>Enviado a desguace</option>
+                    <option {{ (estadoSel == 'Reparado') ? 'selected' }}>Reparado</option>
+                    <option {{ (estadoSel == 'Sin reparacion') ? 'selected' }}>Sin reparacion</option>
+                    <option {{ (estadoSel == 'Presupuesto enviado a cliente') ? 'selected' }}>Presupuesto enviado a cliente</option>
+                    <option {{ (estadoSel == 'Retirado') ? 'selected' }}>Retirado</option>
+                </select>
+            </div>
+            <div>
+                <label for="reparacion_observaciones" class="required">Observaciones</label>
+                <textarea id="reparacion_observaciones" name="reparacion[observaciones]" required="required">{{reparacion.observaciones ?? ''}}</textarea>
+            </div>
+            <div>
+                <label>Materiales</label>
+                <input type='hidden' data-idBuscadorProductos="almacen" value="{{reparacion.almacen.id}}" />
+                {{ include('generales/busProductos.html.twig',{
+                    'nombreCampoProducto' : '',
+                    'busProductoSel' : '',
+                    'busProductoSelTxt' : '',
+                    'callbackCargar' : 'agregarProductoAVenta();',
+                    'placeholder' : 'Materiales',
+                    'materialReparacion' : 1
+                }) }}
+            </div>
+            <div>
+                <label>Materiales asignados</label>
+                <table class="tablaProductosAsignados">
+                    <thead>
+                        <tr>
+                            <th>Material</th>
+                            <th>Precio</th>
+                            <th>Stock actual</th>
+                            <th>Cantidad</th>
+                            <th>Total</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id='productosAsignadosVenta'>
+                        {% for p in productosAsignados %}
+                            <tr id="productoAgregado_{{p.id}}">
+                                <td>{{p.titulo}}</td>
+                                <td data-precioTxt='precio_txt_{{p.id}}'>${{p.precio|number_format(2, ',', '.')}}</td>
+                                <td>{{p.stockActual ~ p.unidad}}</td>
+                                <td>
+                                    <input 
+                                        type="number" 
+                                        placeholder="Cant." 
+                                        data-precio="{{p.precioUnitario}}" 
+                                        data-idproducto="{{p.id}}" 
+                                        data-cantidadanterior="{{p.cantidad}}" 
+                                        data-reglasPrecios="{{p.reglas}}" 
+                                        data-tipocampo="productoAsignado" 
+                                        name="productoAsignado[{{p.id}}]" 
+                                        value="{{p.cantidad}}"
+                                        onchange="calcularTotales();"
+                                    />
+                                </td>
+                                <td id="precioProducto_{{p.id}}">
+                                    ${{(p.precio * p.cantidad)|number_format(0, ',', '.')}}
+                                </td>
+                                <td class="actions">
+                                    <img src="/images/iconos/cancelar.svg" alt="Sacar producto" title="Sacar producto" onclick="sacarProductoVenta(this);" />
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan=4>TOTAL:</td>
+                            <td colspan=2 id='productosPrecioTotal'>${{(precioTotal ?? 0)|number_format(0, ',', '.')}}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div class="botonesFormularios">
+            <a href="{{ path('reparaciones_index') }}" class='btn btnCancelar'>Cancelar</a>
+            <button class="btn btnGuardar" name='guardar' value='1'>Guardar</button>
+            <br/><br/>
+            <button class="btn btnGuardar" name='guardar' value='2'>Guardar y cargar imágenes</button>
+        </div>
+        <input type="hidden" name="_token" value="{{ csrf_token('mesa_trabajo_'~reparacion.id) }}">
+    </form>
+
+
+    <script>
+    function agregarProductoAVenta(){
+        let idProducto = document.getElementById('hiddenProductoId').value;
+        let idAlmacen = document.querySelector('[data-idBuscadorProductos="almacen"]').value;
+
+        let formData = new FormData();
+            formData.append("idProducto", idProducto);
+            formData.append("idAlmacen", idAlmacen);
+
+        fetch("{{ path('ventas_productos') }}", {
+            method: 'post',
+            mode: 'cors',
+            credentials: 'same-origin',
+            body: formData
+        }).then(function(response){
+            return response.json();
+        }).then(function(json){
+            cargaProductoListado(json);
+            document.getElementById('buscador_productos').value = '';
+            document.getElementById('hiddenProductoId').value = '';
+        }).catch(function(error){
+            console.log('ERROR:', error);
+        })
+    }
+
+    function cargaProductoListado(json){
+        
+        if(document.getElementById('productoAgregado_'+json.id) === null){
+
+            let tr = document.createElement('tr');
+                tr.setAttribute('id', 'productoAgregado_'+json.id);
+            let td1 = document.createElement('td');
+                td1.innerHTML = json.titulo;
+            let td2 = document.createElement('td');
+                td2.setAttribute('data-precioTxt', 'precio_txt_'+json.id);
+                td2.innerHTML = '$' + json.precio;
+            let td3 = document.createElement('td');
+                td3.innerHTML = json.stock + json.um
+            let td4 = document.createElement('td');
+            let td4_input = document.createElement('input');
+                td4_input.setAttribute('type', "number");
+                td4_input.setAttribute('placeholder', "Cant.");
+                td4_input.setAttribute('data-idProducto', json.id);
+                td4_input.setAttribute('data-precio', json.precio);
+                td4_input.setAttribute('data-reglasPrecios', json.reglaprecios);
+                td4_input.setAttribute('data-cantidadAnterior', 0);
+                td4_input.setAttribute('data-tipoCampo', 'productoAsignado');
+                td4_input.setAttribute('name', 'productoAsignado['+json.id+']');
+                td4_input.onchange = function(){
+                    calcularTotales();
+                }
+            let td5 = document.createElement('td');
+                td5.setAttribute('id', 'precioProducto_'+json.id);
+                td5.innerHTML = '$0';
+            let td6 = document.createElement('td');
+            let td6_eliminar = document.createElement('img');
+                td6_eliminar.setAttribute('src', "{{asset('images/iconos/cancelar.svg')}}");
+                td6_eliminar.setAttribute('alt', "Sacar producto");
+                td6_eliminar.setAttribute('title', "Sacar producto");
+                td6_eliminar.onclick = function(){
+                    sacarProductoVenta(this);
+                };
+
+            tr.append(td1);
+            tr.append(td2);
+            tr.append(td3);
+            td4.append(td4_input);
+            tr.append(td4);
+            tr.append(td5);
+            td6.append(td6_eliminar);
+            tr.append(td6);
+            document.getElementById('productosAsignadosVenta').prepend(tr);
+        }
+    }
+
+    function calcularTotales(){
+        let precioTotal = 0;
+        document.querySelectorAll('[data-tipocampo="productoAsignado"]').forEach(function(item, index){
+            let precioItem = item.dataset.precio;
+            let cantidad = item.value;
+            let id = item.dataset.idproducto;
+
+            // REVISO LAS REGLAS PARA CADA PRDUCTO
+            let reglasPrecios = item.dataset.reglasprecios;
+            reglasPrecios.split('|').forEach(function(item, index){
+                if(item != ''){
+                    let regla = item.split('-');
+                    if(cantidad >= parseInt(regla[0])){
+                        precioItem = regla[1];
+                    }
+                }
+            });
+            document.querySelectorAll('[data-preciotxt="precio_txt_'+id+'"]')[0].innerHTML = '$'+precioItem;
+
+            let precioTotalItem = precioItem * item.value;
+            precioTotal += precioTotalItem;
+            precioTotalItem = new Intl.NumberFormat("de-DE").format(precioTotalItem);
+            document.getElementById('precioProducto_'+id).innerHTML = "$"+precioTotalItem;
+        });
+        precioTotal = new Intl.NumberFormat("de-DE").format(precioTotal);
+        document.getElementById('productosPrecioTotal').innerHTML = "$"+precioTotal;
+    }
+
+    function sacarProductoVenta(self){
+        self.parentElement.parentElement.remove();
+        calcularTotales();
+    }
+</script>
+
+
+
+
+
+{% endblock %}

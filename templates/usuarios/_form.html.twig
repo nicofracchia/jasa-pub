@@ -1,0 +1,18 @@
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+    <div class="botonesFormularios">
+        <a href="{{ path('usuarios_index') }}" class='btn btnCancelar'>Cancelar</a>
+        <button class="btn btnGuardar">{{ button_label|default('Save') }}</button>
+        {% if usuario.id is defined and usuario.id != null %}
+            <button class="btn btnEliminar" type="button" onclick="eliminar();">Eliminar</button>
+        {% endif %}
+    </div>
+{{ form_end(form) }}
+
+
+<script>
+    function eliminar(){
+        if(confirm('Seguro que desea eliminar este usuario?'))
+            document.getElementById('frmEliminar').submit();
+    }
+</script>

@@ -1,0 +1,17 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Proveedores{% endblock %}
+
+{% block rutas %}Proveedores > <span>Nuevo proveedor</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('proveedores_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Datos del proveedor</h1>
+
+    {{ include('proveedores/_form.html.twig', {'button_label': 'Guardar'}) }}
+{% endblock %}

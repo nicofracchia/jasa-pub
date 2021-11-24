@@ -1,0 +1,18 @@
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+    <div class="botonesFormularios">
+        <a href="{{ path('clientes_index') }}" class='btn btnCancelar'>Cancelar</a>
+        <button class="btn btnGuardar">{{ button_label|default('Save') }}</button>
+        {% if cliente.id is defined and cliente.id != null %}
+            <button class="btn btnEliminar" type="button" onclick="eliminar();">Eliminar</button>
+        {% endif %}
+    </div>
+{{ form_end(form) }}
+
+
+<script>
+    function eliminar(){
+        if(confirm('Seguro que desea eliminar este cliente?'))
+            document.getElementById('frmEliminar').submit();
+    }
+</script>

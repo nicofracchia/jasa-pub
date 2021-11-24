@@ -1,0 +1,50 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Combos y ofertas{% endblock %}
+
+{% block rutas %}<span>Combos y ofertas</span>{% endblock %}
+
+{% block contenido %}
+
+    <div class='filtros'>
+        <a href="{{ path('combos_new') }}"><img src="{{asset('images/iconos/nuevo.png')}}" alt="" /></a>
+    </div>
+    <table class="tablaListados">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <!--<th>% Descuento</th>-->
+                <th>Precio final</th>
+                <th>Habilitado</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for combo in combos %}
+            <tr>
+                <td>{{ combo.id }}</td>
+                <td>{{ combo.nombre }}</td>
+                <!--<td>%{{ combo.porcentajeCosto|number_format(2, ',', '.') }}</td>-->
+                <td>${{ combo.precioFinal|number_format(0, ',', '.') }}</td>
+                <td>
+                    {% if combo.habilitado == 1 %}
+                        Habilitado
+                    {% else %}
+                        Deshabilitado
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ path('combos_edit', {'id': combo.id}) }}"><img src="{{asset('images/iconos/editar_off.png')}}" alt="" /></a>
+                    <a href="{{ path('combos_imagenes', {'id': combo.id}) }}" title='Imagenes'><img src="{{asset('images/iconos/imagenes.svg')}}" alt="" /></a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">No se encontraron combos.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

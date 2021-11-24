@@ -1,0 +1,92 @@
+{% set estadoSel = reparacion.estado ?? '' %}
+
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Órdenes de reparación{% endblock %}
+
+{% block rutas %}Órdenes de reparación > <span>Mesa de trabajo</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('reparaciones_ingreso', {'id': reparacion.id}) }}">Ingreso</a>
+    <a href="{{ path('reparaciones_mesa', {'id': reparacion.id}) }}">Mesa de trabajo</a>
+    <a href="{{ path('reparaciones_imagenes', {'id': reparacion.id}) }}">Imágenes</a>
+    <a href="{{ path('reparaciones_detalle', {'id': reparacion.id}) }}" class="actual">Detalles</a>
+    <a href="{{ path('reparaciones_pagos', {'id': reparacion.id}) }}">Pagos</a>
+    <a href="{{ path('reparaciones_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Órden de reparación</h1>
+
+    <table class='detalleReparaciones'>
+        <tr>
+            <th>N° de orden:</th>
+            <td>LDZ-{{reparacion.id}}</td>
+            <th>Fecha:</th>
+            <td>{{ reparacion.recepcion ? reparacion.recepcion|date('d/m/Y') : '' }}</td>
+            <th>Hora:</th>
+            <td>{{ reparacion.recepcion ? reparacion.recepcion|date('H:i:s') : '' }}</td>
+            <th>Recepción:</th>
+            <td>{{ reparacion.receptor.nombre ?? ''}} {{ reparacion.receptor.apellido ?? ''}}</td>
+        </tr>
+        <tr>
+            <th>Cliente:</th>
+            <td>{{ reparacion.cliente.nombre ?? ''}} {{ reparacion.cliente.apellido ?? ''}}</td>
+            <th>Teléfono:</th>
+            <td>{{ reparacion.cliente.telefono ?? ''}}</td>
+            <th>Mail:</th>
+            <td>{{ reparacion.cliente.mail ?? ''}}</td>
+            <th>Dirección:</th>
+            <td>{{ reparacion.cliente.direccion ?? ''}}</td>
+        </tr>
+        <tr>
+            <th>Artículo:</th>
+            <td>{{ reparacion.articulo ?? ''}}</td>
+            <th>Marca:</th>
+            <td>{{ reparacion.marca ?? ''}}</td>
+            <th>Modelo:</th>
+            <td>{{ reparacion.modelo ?? ''}}</td>
+            <th>N° de serie:</th>
+            <td>{{ reparacion.serial ?? ''}}</td>
+        </tr>
+        <tr>
+            <th>Tarea:</th>
+            <td>{{ reparacion.tarea ?? ''}}</td>
+            <th>Tintas:</th>
+            <td colspan=5>
+                &nbsp;C: %{{reparacion.tintaC ?? '0'}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                M: %{{reparacion.tintaM ?? '0'}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                Y: %{{reparacion.tintaY ?? '0'}} <br/>
+                CL: %{{reparacion.tintaCl ?? '0'}} &nbsp;&nbsp;&nbsp;
+                ML: %{{reparacion.tintaMl ?? '0'}} &nbsp;&nbsp;&nbsp;
+                BK: %{{reparacion.tintaBk ?? '0'}} 
+            </td>
+        </tr>
+        <tr>
+            <th>Reporte</th>
+            <td colspan=7>{{ reparacion.reporte ?? ''}}</td>
+        </tr>
+    </table>
+    {% if reparacion.estado != 'Ingresado' %}
+        <h1>Mesa de trabajo</h1>
+
+        <table class='detalleReparaciones'>
+            <tr>
+                <th>Precio final:</th>
+                <td>${{reparacion.presupuestoFinal ? reparacion.presupuestoFinal|number_format(2, ',', '.') : ''}}</td>
+            </tr>
+            <tr>
+                <th>Diagnóstico</th>
+                <td colspan=7>{{ reparacion.diagnostico ?? ''}}</td>
+            </tr>
+            <tr>
+                <th>Observaciones</th>
+                <td colspan=7>{{ reparacion.observaciones ?? ''}}</td>
+            </tr>
+        </table>
+    {% endif %}
+
+    <a href="{{ path('reparaciones_pdf', {'id': reparacion.id}) }}" class='btn btnGuardar' target='_blank'>Ver PDF</a>
+{% endblock %}

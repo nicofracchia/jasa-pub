@@ -1,0 +1,55 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Combos{% endblock %}
+
+{% block rutas %}Combos > <span>Imágenes del combo</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('combos_edit', {'id': combo.id}) }}">Detalles del combo</a>
+    <a href="{{ path('combos_imagenes', {'id': combo.id}) }}" class="actual">Imágenes</a>
+    <a href="{{ path('combos_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Imágenes del combo</h1>
+
+    <img src="{{ qr_code_path(app.request.uri, { writer: 'svg', size: 150 }) }}" />
+
+    <form method="post" action="{{ path('combos_imagenes', {'id' : combo.id}) }}" enctype="multipart/form-data">
+        <div>
+            <div>
+                <label for="combo_imagen" class="required">Seleccionar imagen</label>
+                <input type="file" id="combo_imagen" name="imagen" placeholder='Seleccionar imagen' required="required" />
+            </div>
+            <div></div><div></div>
+        </div>
+        <div class="botonesFormularios">
+            <a href="{{ path('combos_index') }}" class='btn btnCancelar'>Cancelar</a>
+            <button class="btn btnGuardar" name='guardar' value='1'>Guardar</button>
+        </div>
+        <input type="hidden" name="_token" value="{{ csrf_token('nueva_imagen_'~combo.id) }}">
+    </form>
+
+    <div class='contenedorImagenes'>
+        {% for imagen in imagenes %}
+            <div class='contImg'>
+                <div class='imagen'>
+                    <img src="{{asset(rutaImagenes~imagen)}}" alt="" />
+                </div>
+                <div class='accionesTop'>
+                    <a href="{{asset(rutaImagenes~imagen)}}" title='Abrir en pestaña nueva' target='_blank'>
+                        <img src="{{asset('images/iconos/tamano_normal.svg')}}" alt="" />
+                    </a>
+                    <a href="{{ path('combos_imagenes_borrar', {'id': combo.id, 'imagen': imagen}) }}" title='Eliminar imagen'>
+                        <img src="{{asset('images/iconos/borrar_rojo.svg')}}" alt="" />
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            No hay imágenes para este combo.
+        {% endfor %}
+    </div>
+    
+{% endblock %}

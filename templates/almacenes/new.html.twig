@@ -1,0 +1,17 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Almacenes{% endblock %}
+
+{% block rutas %}Almacenes > <span>Nuevo almacen</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('almacenes_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+
+    {{ include('almacenes/_form.html.twig', {'button_label': 'Guardar'}) }}
+
+{% endblock %}

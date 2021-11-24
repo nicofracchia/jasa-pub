@@ -1,0 +1,51 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Compras{% endblock %}
+
+{% block rutas %}<span>Compras</span>{% endblock %}
+
+{% block contenido %}
+
+    <div class='filtros'>
+        <a href="{{ path('compras_new') }}"><img src="{{asset('images/iconos/nuevo.png')}}" alt="" /></a>
+    </div>
+    <table class="tablaListados">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Fecha pedido</th>
+                <th>Fecha recepción</th>
+                <th>Proveedor / Almacen</th>
+                <!--<th>Precio</th>-->
+                <th>Estado</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for compra in compras %}
+            <tr>
+                <td>{{ compra.id }}</td>
+                <td>{{ compra.fecha ? compra.fecha|date('d/m/Y') : '' }}</td>
+                <td>{{ compra.recepcion ? compra.recepcion|date('d/m/Y') : '' }}</td>
+                <td>{{ compra.proveedor ? compra.proveedor.nombre : compra.almacen.nombre }}</td>
+                <!--<td>${{ compra.precio|number_format(0, ',', '.') }}</td>-->
+                <td>{{ compra.estado }}</td>
+                <td>
+                    {% if compra.estado != 'Finalizado' %}
+                        <a href="{{ path('compras_edit', {'id': compra.id}) }}"><img src="{{asset('images/iconos/editar_off.png')}}" alt="" title="Editar compra" /></a>
+                        <a href="{{ path('compras_productos', {'id': compra.id}) }}"><img src="{{asset('images/iconos/editar-stock_off.png')}}" alt="" title="Cargar productos" /></a>
+                        <a href="{{ path('compras_finalizar', {'id': compra.id}) }}"><img src="{{asset('images/iconos/tilde.svg')}}" alt="" title="Finalizar y actualizar stock" /></a>
+                    {% else %}
+                        <a href="{{ path('compras_ver', {'id': compra.id}) }}"><img src="{{asset('images/iconos/ver.png')}}" alt="" title="Ver detalles"/></a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">No se encontraron órdenes de compra.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

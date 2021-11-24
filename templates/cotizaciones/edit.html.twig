@@ -1,0 +1,21 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Cotizaciones{% endblock %}
+
+{% block rutas %}Cotizaciones > <span>Nueva cotización</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('cotizaciones_edit', {'id': cotizacion.id}) }}" class="actual">Detalles de la cotización</a>
+    <a href="{{ path('cotizaciones_venta', {'id': cotizacion.id}) }}">Generar venta</a>
+    <a href="{{ path('cotizaciones_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Editar cotizacion</h1>
+
+    <form method="post" action="{{ path('cotizaciones_edit', {'id' : cotizacion.id}) }}">
+        {{ include('cotizaciones/_form.html.twig') }}
+    </form>
+{% endblock %}

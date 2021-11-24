@@ -1,0 +1,20 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Órdenes de compra{% endblock %}
+
+{% block rutas %}Órdenes de compra > <span>Nueva orden de compra</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('compras_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Nueva orden de compra</h1>
+
+    <form method="post" action="{{ path('compras_new') }}">
+        {{ include('compras/_form.html.twig') }}
+    </form>
+
+{% endblock %}

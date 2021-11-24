@@ -1,0 +1,24 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Órdenes de compra{% endblock %}
+
+{% block rutas %}Órdenes de compra > <span>Editar orden de compra</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('compras_edit', {'id': compra.id}) }}" class="actual">Detalles de la orden</a>
+    <a href="{{ path('compras_productos', {'id': compra.id}) }}">Productos de la orden</a>
+    <a href="{{ path('compras_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Editar orden de compra</h1>
+
+    <form method="post" action="{{ path('compras_edit', {'id' : compra.id}) }}">
+        {{ include('compras/_form.html.twig') }}
+    </form>
+    <form method="post" action="{{ path('compras_finalizar', {'id' : compra.id}) }}">
+        <button class="btn btnGuardar" name='guardar' style='background-color:var(--celeste);'>Finalizar y actualizar stock</button>
+    </form>
+{% endblock %}

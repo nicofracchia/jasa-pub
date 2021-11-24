@@ -1,0 +1,19 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Proveedores{% endblock %}
+
+{% block rutas %}Proveedores > <span>Asignar productos</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('proveedores_edit', {'id': proveedore.id}) }}">Detalles del proveedor</a>
+    <a href="{{ path('proveedores_productos', {'id': proveedore.id}) }}" class="actual">Productos del proveedor</a>
+    <a href="{{ path('proveedores_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Productos del proveedor {{ proveedore.nombre }}</h1>
+
+    {{ include('proveedores_productos/_form.html.twig') }}
+{% endblock %}

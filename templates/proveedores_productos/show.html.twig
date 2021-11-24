@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ProveedoresProductos{% endblock %}
+
+{% block body %}
+    <h1>ProveedoresProductos</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ proveedores_producto.id }}</td>
+            </tr>
+            <tr>
+                <th>Costo</th>
+                <td>{{ proveedores_producto.costo }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('proveedores_productos_index') }}">back to list</a>
+
+    <a href="{{ path('proveedores_productos_edit', {'id': proveedores_producto.id}) }}">edit</a>
+
+    {{ include('proveedores_productos/_delete_form.html.twig') }}
+{% endblock %}

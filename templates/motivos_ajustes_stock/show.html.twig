@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}MotivosAjustesStock{% endblock %}
+
+{% block body %}
+    <h1>MotivosAjustesStock</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ motivos_ajustes_stock.id }}</td>
+            </tr>
+            <tr>
+                <th>Nombre</th>
+                <td>{{ motivos_ajustes_stock.nombre }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('motivos_ajustes_stock_index') }}">back to list</a>
+
+    <a href="{{ path('motivos_ajustes_stock_edit', {'id': motivos_ajustes_stock.id}) }}">edit</a>
+
+    {{ include('motivos_ajustes_stock/_delete_form.html.twig') }}
+{% endblock %}

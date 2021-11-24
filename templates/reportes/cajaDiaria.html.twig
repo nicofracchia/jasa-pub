@@ -1,0 +1,37 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Reportes{% endblock %}
+
+{% block rutas %}Reportes - <span>Caja diaria</span>{% endblock %}
+
+{% block contenido %}
+    <h1>Reporte caja diaria</h1>
+
+    <div class="contenedorReportes">
+        <div class="tablaReportes">
+            <table>
+                <tr>
+                    <th>Hora</th>
+                    <th>Movimiento</th>
+                    <th>Monto</th>
+                    <th>Observaciones</th>
+                </tr>
+                {% for t in tabla %}
+                    <tr>
+                        <td class='alIzq'>{{ t.fecha }}</td>
+                        <td class='alIzq'>{{t.movimiento}}</td>
+                        <td class='alCen'>${{t.monto|number_format(0, ',', '.')}}</td>
+                        <td class='alIzq'>
+                            {% if t.movimiento == 'Cierre de caja' %}
+                                Saldo estimado: ${{t.observaciones|number_format(0, ',', '.')}}
+                            {% else %}
+                                {{t.observaciones}}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

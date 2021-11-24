@@ -1,0 +1,289 @@
+<style>
+    .contenedor_buscador .listado_productos_asignar .tabla_productos_asignar .acciones img, .contenedor_productos img{
+        transform: rotate(0deg);
+    }
+    .acciones{
+        justify-content: center;
+    }
+</style>
+
+
+
+    <div class="contenedor_productos">
+        <h2>Productos para asignar</h2>
+
+        {{ include('generales/productosJson.html.twig') }}
+
+        <div class="listado_productos">
+            <table class="tabla_productos_asignar">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cod. Barras</th>
+                    <th>Categoría</th>
+                    <th>Título</th>
+                    <th>Costo</th>
+                    <th>Stock</th>
+                    <th>Cantidad</th>
+                    <th>Asignar</th>
+                </tr>
+                </thead>
+                <tbody id="listado_productos_asignar">
+                    <!-- PRODUCTOS DESDE EL BUSCADOR -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="contenedor_productos">
+        <h2>Productos asignados</h2>
+
+        <div class="contenedor_asignados">
+                <table class="tabla_productos_asignar">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cod. Barras</th>
+                        <th>Categoría</th>
+                        <th>Título</th>
+                        <th>Costo</th>
+                        <th>Cantidad</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody id="productos_asignados">
+                        {% for producto in productos %}
+                            <tr>
+                                <td>{{ producto.idProducto }}</td>
+                                <td>{{ producto.codigoBarras }}</td>
+                                <td>{{ producto.categoria }}</td>
+                                <td>{{ producto.titulo }}</td>
+                                <td>$ {{ producto.precio|number_format(2, ',', '.') }}</td>
+                                <td>
+                                    <span class='ocultoEditando'>{{ producto.cantidad}}</span>
+                                    <input class='ocultoEditar' type='number' name='prodMod_{{ producto.idProducto }}' id='prodMod_{{ producto.idProducto }}' placeholder='{{producto.unidad}}' min='0' value="{{ producto.cantidad }}" />
+                                    {{ ' ' ~ producto.unidad}}
+                                </td>
+                                <td>
+                                    <img src='{{asset('images/iconos/editar_off.png')}}' class='ocultoEditando' alt='Editar costo' title='Editar costo' onclick='muestraEditar({{ producto.idProducto }});' />
+                                    <img src='{{asset('images/iconos/guardar.svg')}}' class='ocultoEditar' alt='Guardar' title='Guardar'  onclick='asignarProducto({{ producto.idProducto }}, {{ compra.id }}, 1);' />
+                                    <img src='{{asset('images/iconos/cancelar.svg')}}' class='ocultoEditar' alt='Cancelar' title='Cancelar' onclick='cancelaEditar({{ producto.idProducto }});' />
+                                    <img src='{{asset('images/iconos/borrar.svg')}}' class='ocultoEditando' alt='Eliminar producto' title='Eliminar producto'  onclick='eliminar({{ producto.idProducto }}, {{ compra.id }});' />
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+        </div>
+
+    </div>
+
+
+
+
+<script>
+    function responseFrmFiltros(productos){
+        actualizaTablaAsignar(productos);
+    }
+
+    function actualizaTablaAsignar(productos){
+        let tabla = document.querySelector('#listado_productos_asignar');
+        tabla.innerHTML = "";
+        let HTML = "<tr id='trSinResultados'><td colspan=5>No se encontraron productos.</td></tr>";
+        if(productos.length > 0){
+            HTML = "";
+            for(let i = 0; i < productos.length; i++){
+                HTML += "<tr>";
+                HTML += "   <td>"+productos[i]['ID']+"</td>";
+                HTML += "   <td>"+productos[i]['codigo_barras']+"</td>";
+                HTML += "   <td>"+productos[i]['categoria']+"</td>";
+                HTML += "   <td>"+productos[i]['titulo']+"</td>";
+                HTML += "   <td>$"+productos[i]['costo']+"</td>";
+                HTML += "   <td>"+productos[i]['stock']+productos[i]['unidad_medida_corto']+"</td>";
+                HTML += "   <td><input type='number' name='prodAdd_"+productos[i]['ID']+"' id='prodAdd_"+productos[i]['ID']+"' placeholder='Cant.' min='0' />"+productos[i]['unidad_medida_corto']+"</td>";
+                HTML += "   <td class='acciones'>";
+                HTML += "       <img src='{{asset('images/iconos/volver.png')}}' alt='Asignar producto' title='Asignar producto'  onclick='asignarProducto("+productos[i]['ID']+", {{ compra.id }});' style='transform: rotate(270deg);' />";
+                HTML += "   </td>";
+                HTML += "</tr>";
+            }
+        }
+        tabla.innerHTML = HTML;
+    }
+
+    function asignarProducto(idProd, idCom, tipo = 0){
+        let cant;
+
+        if(tipo == 1)
+            cant = document.querySelector('#prodMod_'+idProd);
+        else
+            cant = document.querySelector('#prodAdd_'+idProd);
+        
+
+        cant = parseInt(cant.value);
+        if(isNaN(cant))
+            cant = 1;
+
+        let formData = new FormData();
+        formData.append("idProducto", idProd);
+        formData.append("idCompra", idCom);
+        formData.append("cantidad", cant);
+        console.log(...formData);
+
+        fetch("{{ path('compras_productos_asignar') }}", {
+            method: 'post',
+            mode: 'cors',
+            credentials: 'same-origin',
+            body: formData
+        }).then(function(response){
+            return response.json();
+        }).then(function(json){
+            agregarFila(json);
+        }).catch(function(error){
+            console.log('ERROR:', error);
+        })
+
+        // CAMBIO PRECIO EN SPAN Y LLAMO A CANCELAR EDITAR
+        if(tipo == 1) {
+            cambioSpanPrecio(idProd);
+            cancelaEditar(idProd);
+        }
+
+    }
+    function agregarFila(json){
+        let prodMod = document.querySelector('#prodMod_'+json.id);
+        if(prodMod !== null)
+            cambioSpanPrecio(json.id);
+        else
+            agregarFilaNuevoProducto(json);
+    }
+
+    function agregarFilaNuevoProducto(json){
+        let tr = document.createElement('tr');
+        let td1 = document.createElement('td');
+            td1.innerHTML = json.id;
+        let td2 = document.createElement('td');
+            td2.innerHTML = json.codigoBarras;
+        let td3 = document.createElement('td');
+            td3.innerHTML = json.categoria;
+        let td4 = document.createElement('td');
+            td4.innerHTML = json.titulo;
+        let td5 = document.createElement('td');
+            td5.innerHTML = '$ '+new Intl.NumberFormat("de-DE").format(json.costo);
+    /*
+        let td6 = document.createElement('td');
+            td6.innerHTML = '$ '+new Intl.NumberFormat("de-DE").format(json.precio);
+    */
+        let td7 = document.createElement('td');
+        let td7span = document.createElement('span');
+            td7span.classList.add('ocultoEditando');
+            td7span.innerHTML = new Intl.NumberFormat("de-DE").format(json.cantidad);
+        let td7input = document.createElement('input');
+            td7input.classList.add('ocultoEditar');
+            td7input.setAttribute('type', 'number');
+            td7input.setAttribute('name', 'prodMod_'+json.id);
+            td7input.setAttribute('id', 'prodMod_'+json.id);
+            td7input.setAttribute('placeholder', '--- UNIDAD ---');
+            td7input.setAttribute('min', '0');
+            td7input.value = json.cantidad;
+            td7.appendChild(td7span);
+            td7.appendChild(td7input);
+        let td9 = document.createElement('td');
+        let td9img1 = document.createElement('img');
+            td9img1.setAttribute('src', '{{asset('images/iconos/editar_off.png')}}');
+            td9img1.setAttribute('alt', 'Editar costo');
+            td9img1.setAttribute('title', 'Editar costo');
+            td9img1.classList.add('ocultoEditando');
+            td9img1.onclick = function(){muestraEditar(json.id);}
+        let td9img2 = document.createElement('img');
+            td9img2.setAttribute('src', '{{asset('images/iconos/guardar.svg')}}');
+            td9img2.setAttribute('alt', 'Guardar');
+            td9img2.setAttribute('title', 'Guardar');
+            td9img2.classList.add('ocultoEditar');
+            td9img2.onclick = function(){asignarProducto(json.id, {{ compra.id }}, 1);}
+        let td9img3 = document.createElement('img');
+            td9img3.setAttribute('src', '{{asset('images/iconos/cancelar.svg')}}');
+            td9img3.setAttribute('alt', 'Cancelar');
+            td9img3.setAttribute('title', 'Cancelar');
+            td9img3.classList.add('ocultoEditar');
+            td9img3.onclick = function(){cancelaEditar(json.id);}
+        let td9img4 = document.createElement('img');
+            td9img4.setAttribute('src', '{{asset('images/iconos/borrar.svg')}}');
+            td9img4.setAttribute('alt', 'Eliminar producto');
+            td9img4.setAttribute('title', 'Eliminar producto');
+            td9img4.classList.add('ocultoEditando');
+            td9img4.onclick = function(){eliminar(json.id, {{ compra.id }});}
+            td9.appendChild(td9img1);
+            td9.appendChild(td9img2);
+            td9.appendChild(td9img3);
+            td9.appendChild(td9img4);
+
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+        tr.appendChild(td4);
+        tr.appendChild(td5);
+        //tr.appendChild(td6);
+        tr.appendChild(td7);
+        tr.appendChild(td9);
+
+        document.getElementById('productos_asignados').prepend(tr);
+    }
+
+    function cambioSpanPrecio(idProd){
+        let campo = document.querySelector('#prodMod_'+idProd);
+        let cant = campo.value;
+        campo.parentElement.querySelectorAll('.ocultoEditando')[0].innerHTML = cant;
+    }
+
+    function muestraEditar(idProd){
+        let self = document.querySelector('#prodMod_'+idProd);
+        let tr = self.parentElement.parentElement;
+        let ocultosEditar = tr.querySelectorAll(".ocultoEditar");
+        let ocultosEditando = tr.querySelectorAll(".ocultoEditando");
+        for(let i = 0; i < ocultosEditar.length; i++){
+            ocultosEditar[i].style.display = "inline-block";
+        }
+        for(let i = 0; i < ocultosEditando.length; i++){
+            ocultosEditando[i].style.display = "none";
+        }
+
+    }
+
+    function cancelaEditar(idProd){
+        let self = document.querySelector('#prodMod_'+idProd);
+        let tr = self.parentElement.parentElement;
+        let ocultosEditar = tr.querySelectorAll(".ocultoEditar");
+        let ocultosEditando = tr.querySelectorAll(".ocultoEditando");
+        for(let i = 0; i < ocultosEditar.length; i++){
+            ocultosEditar[i].style.display = "none";
+        }
+        for(let i = 0; i < ocultosEditando.length; i++){
+            ocultosEditando[i].style.display = "inline-block";
+        }
+
+    }
+
+    function eliminar(idProd, idCom){
+        if(confirm('Seguro que desea eliminar el producto de esta orden de compra?')){
+            let formData = new FormData();
+            formData.append("idProducto", idProd);
+            formData.append("idCompra", idCom);
+
+            fetch("{{ path('compras_productos_eliminar') }}", {
+                method: 'post',
+                mode: 'cors',
+                credentials: 'same-origin',
+                body: formData
+            }).then(function(response){
+                return response.json();
+            }).then(function(json){
+                console.log('JSON ELIMINAR:', json);
+            }).catch(function(error){
+                console.log('ERROR:', error);
+            })
+
+            // ELIMINO LA FILA
+            document.querySelector('#prodMod_'+idProd).parentElement.parentElement.remove();
+        }
+    }
+</script>

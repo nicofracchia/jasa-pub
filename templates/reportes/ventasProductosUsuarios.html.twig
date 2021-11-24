@@ -1,0 +1,39 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Reportes{% endblock %}
+
+{% block rutas %}Reportes - <span>Ventas por producto y usuario</span>{% endblock %}
+
+{% block contenido %}
+    <h1>Reporte ventas por producto y usuario</h1>
+
+    <div class="contenedorReportes">
+        <div class="tablaReportes">
+            <table>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Almacen</th>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio unitario</th>
+                    <th>Precio total</th>
+                    <th>Cliente</th>
+                    <th>Usuario</th>
+                </tr>
+                {% for t in tabla %}
+                    <tr>
+                        <td class='alIzq'>{{ t.fecha|date('d/m/Y') }}</td>
+                        <td class='alIzq'>{{ t.almacen }}</td>
+                        <td class='alIzq'>{{t.producto}}</td>
+                        <td class='alCen'>{{t.cantidad|number_format(0, ',', '.')}} {{t.unidad_medida}}</td>
+                        <td class='alCen'>${{t.precio_unitario|number_format(0, ',', '.')}}</td>
+                        <td class='alCen'>${{t.precio_total|number_format(0, ',', '.')}}</td>
+                        <td class='alIzq'>{{t.cliente}}</td>
+                        <td class='alIzq'>{{t.usuario}}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

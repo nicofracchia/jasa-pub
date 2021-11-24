@@ -1,0 +1,109 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Alertas{% endblock %}
+
+{% block rutas %}<span>Alertas</span>{% endblock %}
+
+{% block contenido %}
+
+    <h1>Alertas</h1>
+
+    <h2>Último cierre de caja</h2>
+    <table class="tablaListados tablaCierreCaja">
+        <thead>
+            <tr>
+                <th>Inicio</th>
+                <th>Cierre</th>
+                <th>Saldo final</th>
+                <th>Saldo estimado</th>
+                <th>Diferencia</th>
+                <th>Usuario</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in caja %}
+                <tr class="{{ (c.diferencia == 0) ? 'verde' : 'rojo' }}">
+                    <td>{{ c.inicio | date('d/m/Y H:i:s') | replace({' ': '<br/>'}) | raw }}</td>
+                    <td>{{ c.cierre | date('d/m/Y H:i:s') | replace({' ': '<br/>'}) | raw }}</td>
+                    <td>${{c.saldo_final|number_format(0, ',', '.')}}</td>
+                    <td>${{c.saldo_estimado|number_format(0, ',', '.')}}</td>
+                    <td>${{c.diferencia|number_format(0, ',', '.')}}</td>
+                    <td>{{c.usuario_cierre}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Stock de productos</h2>
+    <table class="tablaListados">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Título</th>
+                <th>Almacen</th>
+                <th>Stock mínimo</th>
+                <th>Stock actual</th>
+                <th>Costo</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in productos %}
+                <tr class="{{ (p.stock == 0) ? 'rojo' : 'naranja' }}">
+                    <td>{{p.id}}</td>
+                    <td>{{p.titulo}}</td>
+                    <td>{{p.almacen}}</td>
+                    <td>{{p.stock_minimo|number_format(0, ',', '.')}}</td>
+                    <td>{{p.stock|number_format(0, ',', '.')}}</td>
+                    <td>${{p.costo|number_format(0, ',', '.')}}</td>
+                    <td>${{p.precio|number_format(0, ',', '.')}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Cotizaciones</h2>
+    <table class="tablaListados">
+        <thead>
+            <tr>
+                <th>Vencimiento</th>
+                <th>Almacen</th>
+                <th>Cliente</th>
+                <th>Creador</th>
+                <th>Costo</th>
+                <th>Precio</th>
+                <th>Mantiene el precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in cotizaciones %}
+                <tr class="{{ (date(c.hasta) >= date('now')) ? 'naranja' : 'rojo' }}">
+                    <td>{{c.hasta|date('d/m/Y')}}</td>
+                    <td>{{c.almacen}}</td>
+                    <td>{{c.cliente}}</td>
+                    <td>{{c.creador}}</td>
+                    <td>${{c.costo|number_format(0, ',', '.')}}</td>
+                    <td>${{c.precio|number_format(0, ',', '.')}}</td>
+                    <td>{{ (c.mantener_precio == 1) ? 'SI':'NO' }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <style>
+        .tablaCierreCaja,
+        .tablaCierreCaja thead tr th{
+            text-align:center;
+        }
+        .naranja td{
+            color:var(--naranja);
+        }
+        .rojo td{
+            color:var(--rojo);
+        }
+        .verde td{
+            color:var(--verde);
+        }
+    </style>
+
+{% endblock %}

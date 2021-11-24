@@ -1,0 +1,5 @@
+<form method="post" action="{{ path('combos_delete', {'id': combo.id}) }}" onsubmit="return confirm('Seguro que desea eliminar este combo?');">
+    <input type="hidden" name="_method" value="DELETE">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ combo.id) }}">
+    <button class="btn btnEliminar">Eliminar</button>
+</form>

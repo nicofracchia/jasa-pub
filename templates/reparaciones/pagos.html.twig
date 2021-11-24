@@ -1,0 +1,61 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Órdenes de reparación{% endblock %}
+
+{% block rutas %}Órdenes de reparación > <span>Pagos</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('reparaciones_ingreso', {'id': reparacion.id}) }}">Ingreso</a>
+    <a href="{{ path('reparaciones_mesa', {'id': reparacion.id}) }}">Mesa de trabajo</a>
+    <a href="{{ path('reparaciones_imagenes', {'id': reparacion.id}) }}">Imágenes</a>
+    <a href="{{ path('reparaciones_detalle', {'id': reparacion.id}) }}">Detalles</a>
+    <a href="{{ path('reparaciones_pagos', {'id': reparacion.id}) }}" class="actual">Pagos</a>
+    <a href="{{ path('reparaciones_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Pagos {{  clienteNYA != '' ? 'de ' ~ clienteNYA : '' }}</h1>
+    <h5>Fecha de ingreso: {{ reparacion.recepcion|date("d/m/Y") }}</h5>
+    <h5>Seña: ${{ reparacion.sena|number_format(2, ',', '.') }}</h5>
+    <h5>Presupuesto inicial: ${{ reparacion.presupuestoInicial|number_format(2, ',', '.') }}</h5>
+    <h5>Precio final: ${{ precioFinal|number_format(2, ',', '.') }}</h5>
+    <h5>Pendiente: ${{ pendiente|number_format(2, ',', '.') }}</h5>
+    
+    {{ include('reparaciones/_pagos_form.html.twig') }}
+
+    <h1>Pagos realizados</h1>
+    <br/><br/>
+    <table class='tablaListadoPagosVenta'>
+        <tr>
+            <th>Fecha</th>
+            <th>Nota de venta</th>
+            <th>Medio de pago</th>
+            <th>Interes</th>
+            <th>Monto</th>
+            <th>TOTAL</th>
+            <th>Observaciones</th>
+        </tr>
+        {% for p in pagos %}
+            {% set interes = p.interes %}
+            {% if p.medioPago.id == 1 %}
+                {% set interes = interes * -1 %}
+            {% endif %}
+            {% set totalPago = p.monto + p.monto * interes / 100 %}
+            {% if p.medioPago.id == 7 %}
+                {% set totalPago = 0 %}
+            {% endif %}
+            <tr>
+                <td>{{p.fecha|date("d/m/Y")}}</td>
+                <td>{{ (p.notaVenta == 1) ? 'F':'SF'}}</td>
+                <td>{{p.medioPago.nombre}}</td>
+                <td>%{{ p.interes }}</td>
+                <td>${{ p.monto|number_format(2, ',', '.') }}</td>
+                <td>${{ totalPago|number_format(2, ',', '.') }}</td>
+                <td>{{ p.observaciones }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Reportes{% endblock %}
+
+{% block rutas %}Reportes - <span>Movimientos</span>{% endblock %}
+
+{% block contenido %}
+    <h1>Reporte movimientos</h1>
+
+    <div class="contenedorReportes">
+        <div class="tablaReportes">
+            <table>
+                <tr>
+                    <th>Almacen</th>
+                    <th>Fecha y hora</th>
+                    <th>Tipo</th>
+                    <th>Monto</th>
+                    <th>Medio de pago</th>
+                    <th>Detalles del pago</th>
+                    <th>Observaciones</th>
+                    <th>PDF</th>
+                </tr>
+                {% for t in tabla %}
+                    <tr>
+                        <td class='alIzq'>{{t.almacen}}</td>
+                        <td class='alCen'>{{ t.fecha | date('d/m/Y H:i:s') | replace({' ': '<br/>'}) | raw }}</td>
+                        <td class='alIzq'>{{t.tipo}}</td>
+                        <td class='alDer'>${{t.monto|number_format(0, ',', '.')}}</td>
+                        <td class='alCen'>{{t.medio_pago}}</td>
+                        <td class='alIzq'>{{ t.detalle_medio | replace({',': '<br/>'}) | raw }}</td>
+                        <td class='alIzq'>{{t.observaciones}}</td>
+                        <td class='alDer'>
+                            {% if t.id_venta != 0 %}
+                                <a href="{{ path('ventas_pdf', {'id':  t.id_venta}) }}" target='_blank'><img src="{{asset('images/iconos/pdf.svg')}}" alt="" title="Nota de venta" /></a>
+                                <a href="{{ path('ventas_pdf_iva', {'id': t.id_venta}) }}" target='_blank'><img src="{{asset('images/iconos/pdf.svg')}}" alt="" title="Nota de venta con IVA discriminado" /></a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

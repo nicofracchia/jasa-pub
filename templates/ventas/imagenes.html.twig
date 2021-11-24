@@ -1,0 +1,57 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Ventas{% endblock %}
+
+{% block rutas %}Ventas > <span>Imágenes de la venta</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('ventas_edit', {'id': venta.id}) }}">Detalles de la venta</a>
+    <a href="{{ path('ventas_imagenes', {'id': venta.id}) }}" class="actual">Imágenes</a>
+    <a href="{{ path('ventas_envio', {'id': venta.id}) }}">Detalles de envío</a>
+    <a href="{{ path('ventas_pagos', {'id': venta.id}) }}">Pagos</a>
+    <a href="{{ path('ventas_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Imágenes de la venta</h1>
+
+    <img src="{{ qr_code_path(app.request.uri, { writer: 'svg', size: 150 }) }}" />
+
+    <form method="post" action="{{ path('ventas_imagenes', {'id' : venta.id}) }}" enctype="multipart/form-data">
+        <div>
+            <div>
+                <label for="venta_imagen" class="required">Seleccionar imagen</label>
+                <input type="file" id="venta_imagen" name="imagen" placeholder='Seleccionar imagen' required="required" />
+            </div>
+            <div></div><div></div>
+        </div>
+        <div class="botonesFormularios">
+            <a href="{{ path('ventas_index') }}" class='btn btnCancelar'>Cancelar</a>
+            <button class="btn btnGuardar" name='guardar' value='1'>Guardar</button>
+        </div>
+        <input type="hidden" name="_token" value="{{ csrf_token('nueva_imagen_'~venta.id) }}">
+    </form>
+
+    <div class='contenedorImagenes'>
+        {% for imagen in imagenes %}
+            <div class='contImg'>
+                <div class='imagen'>
+                    <img src="{{asset(rutaImagenes~imagen)}}" alt="" />
+                </div>
+                <div class='accionesTop'>
+                    <a href="{{asset(rutaImagenes~imagen)}}" title='Abrir en pestaña nueva' target='_blank'>
+                        <img src="{{asset('images/iconos/tamano_normal.svg')}}" alt="" />
+                    </a>
+                    <a href="{{ path('ventas_imagenes_borrar', {'id': venta.id, 'imagen': imagen}) }}" title='Eliminar imagen'>
+                        <img src="{{asset('images/iconos/borrar_rojo.svg')}}" alt="" />
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            No hay imágenes para esta venta.
+        {% endfor %}
+    </div>
+    
+{% endblock %}

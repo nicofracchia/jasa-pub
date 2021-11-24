@@ -1,0 +1,49 @@
+<div class='baseModal'>
+    <div class='contenidoModal'>
+        <input type="hidden" name="modalCliente_token" id="modalCliente_token" value="{{ csrf_token('nuevo_cliente') }}">
+        <div class='cerrarModal' onclick="oGen.fnCerrarModal(this);">
+            <img src="{{asset('images/iconos/cancelar.svg')}}" alt='Cerrar' title='Cerrar' />
+        </div>
+        <h1>Nuevo cliente</h1>
+        <div>
+            <label for="modalCliente_rs">Razón social</label>
+            <input type="text" id="modalCliente_rs" name="modalCliente[rs]">
+        </div>
+        <div>
+            <label for="modalCliente_nombre" class="required">Nombre</label>
+            <input type="text" id="modalCliente_nombre" name="modalCliente[nombre]" required="required">
+        </div>
+        <div>
+            <label for="modalCliente_apellido" class="required">Apellido</label>
+            <input type="text" id="modalCliente_apellido" name="modalCliente[apellido]" required="required">
+        </div>
+        <div>
+            <label for="modalCliente_mail" class="required">Mail</label>
+            <input type="text" id="modalCliente_mail" name="modalCliente[mail]" required="required">
+        </div>
+        <div>
+            <label for="modalCliente_dni" class="required">DNI</label>
+            <input type="text" id="modalCliente_dni" name="modalCliente[dni]" required="required">
+        </div>
+        <div>
+            <label for="modalCliente_cuit">CUIT</label>
+            <input type="number" id="modalCliente_cuit" name="modalCliente[cuit]">
+        </div>
+        <div>
+            <label for="modalCliente_telefono">Teléfono</label>
+            <input type="text" id="modalCliente_telefono" name="modalCliente[telefono]">
+        </div>
+        <div>
+            <label for="modalCliente_direccion">Dirección</label>
+            <input type="text" id="modalCliente_direccion" name="modalCliente[direccion]">
+        </div>
+        <div>
+            <label for="modalCliente_cc">Cuenta corriente</label>
+            <input type="checkbox" id="modalCliente_cc" name="modalCliente[cc]" value="1">
+        </div>
+        <div>
+            <label></label>
+            <button class="btn btnGuardar" onclick="oCli.fnGuardaClienteModal()">Guardar</button>
+        </div>
+    </div>
+</div>

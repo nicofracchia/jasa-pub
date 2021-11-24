@@ -1,0 +1,18 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Combos{% endblock %}
+
+{% block rutas %}Combos > <span>Nuevo combo</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('combos_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Detalles del combo</h1>
+
+    {{ include('combos/_form.html.twig') }}
+
+{% endblock %}

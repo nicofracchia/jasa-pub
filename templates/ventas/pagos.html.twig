@@ -1,0 +1,62 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - ventas{% endblock %}
+
+{% block rutas %}Ventas > <span>Pagos</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('ventas_edit', {'id': venta.id}) }}">Detalles de la venta</a>
+    <a href="{{ path('ventas_imagenes', {'id': venta.id}) }}">Imágenes</a>
+    <a href="{{ path('ventas_envio', {'id': venta.id}) }}">Detalles de envío</a>
+    <a href="{{ path('ventas_pagos', {'id': venta.id}) }}" class="actual">Pagos</a>
+    <a href="{{ path('ventas_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    
+    <h1>Pagos {{  clienteNYA != '' ? 'de ' ~ clienteNYA : '' }}</h1>
+    <h5>Fecha: {{ venta.fecha|date("d/m/Y") }}</h5>
+    <h5>Productos: ${{ precioProductos|number_format(2, ',', '.') }}</h5>
+    <h5>Embalaje: ${{ precioEmbalaje|number_format(2, ',', '.') }}</h5>
+    <h5>Envio: ${{ precioEnvio|number_format(2, ',', '.') }}</h5>
+    <h5>Total: ${{ precioFinal|number_format(2, ',', '.') }}</h5>
+    <h5>Pendiente: ${{ pendiente|number_format(2, ',', '.') }}</h5>
+    
+    {{ include('ventas/_pagos_form.html.twig') }}
+
+    <h1>Pagos realizados</h1>
+    <br/><br/>
+    <table class='tablaListadoPagosVenta'>
+        <tr>
+            <th>Fecha</th>
+            <th>Nota de venta</th>
+            <th>Medio de pago</th>
+            <th>Interes</th>
+            <th>Monto</th>
+            <th>TOTAL</th>
+            <th>Observaciones</th>
+        </tr>
+        {% for p in pagos %}
+            {% set interes = p.interes %}
+            {% if p.medioPago.id == 1 %}
+                {% set interes = interes * -1 %}
+            {% endif %}
+            {% set totalPago = p.monto + p.monto * interes / 100 %}
+            {% if p.medioPago.id == 7 %}
+                {% set totalPago = 0 %}
+            {% endif %}
+            <tr>
+                <td>{{p.fecha|date("d/m/Y")}}</td>
+                <td>{{ (p.notaVenta == 1) ? 'F':'SF'}}</td>
+                <td>{{p.medioPago.nombre}}</td>
+                <td>%{{ p.interes }}</td>
+                <td>${{ p.monto|number_format(2, ',', '.') }}</td>
+                <td>${{ totalPago|number_format(2, ',', '.') }}</td>
+                <td>{{ p.observaciones }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Órdenes de reparación{% endblock %}
+
+{% block rutas %}Órdenes de reparación > <span>Editar orden de reparación</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('reparaciones_ingreso', {'id': reparacion.id}) }}" class="actual">Ingreso</a>
+    <a href="{{ path('reparaciones_mesa', {'id': reparacion.id}) }}">Mesa de trabajo</a>
+    <a href="{{ path('reparaciones_imagenes', {'id': reparacion.id}) }}">Imágenes</a>
+    <a href="{{ path('reparaciones_detalle', {'id': reparacion.id}) }}">Detalles</a>
+    <a href="{{ path('reparaciones_pagos', {'id': reparacion.id}) }}">Pagos</a>
+    <a href="{{ path('reparaciones_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Editar orden de reparación</h1>
+
+    <form method="post" action="{{ path('reparaciones_ingreso', {'id' : reparacion.id}) }}">
+        {{ include('reparaciones/_ingreso_form.html.twig') }}
+    </form>
+{% endblock %}

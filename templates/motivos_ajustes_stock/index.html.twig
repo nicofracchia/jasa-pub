@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}MotivosAjustesStock index{% endblock %}
+
+{% block body %}
+    <h1>MotivosAjustesStock index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for motivos_ajustes_stock in motivos_ajustes_stocks %}
+            <tr>
+                <td>{{ motivos_ajustes_stock.id }}</td>
+                <td>{{ motivos_ajustes_stock.nombre }}</td>
+                <td>
+                    <a href="{{ path('motivos_ajustes_stock_show', {'id': motivos_ajustes_stock.id}) }}">show</a>
+                    <a href="{{ path('motivos_ajustes_stock_edit', {'id': motivos_ajustes_stock.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('motivos_ajustes_stock_new') }}">Create new</a>
+{% endblock %}

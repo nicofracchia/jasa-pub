@@ -1,0 +1,71 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - LOG IN{% endblock %}
+
+{% block loginFrm %}
+    <style>
+        form{
+            width:100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height:calc(100vh - 4vw - 3vh);
+        }
+        .contenedor_login{
+            width:50%;
+            text-align:center;
+            flex-direction: column;
+            flex-wrap: wrap;
+            margin-top:-10vh;
+        }
+        .div_login{
+            font-size:var(--negro);
+            font-size: 1.5vmax;
+            margin:0.5vmax 0;
+        }
+        input[type=email],
+        input[type=password] {
+            width:40%;
+            font-size: 0.7vmax;
+            color: var(--negro);
+            border: solid 1px var(--naranja);
+            padding: 0.5vmax;
+            border-radius: 10px;
+            resize: none;
+            margin:0.5vmax 0;
+        }
+        button{
+            width:40%;
+            font-size: 0.8vmax;
+            color: var(--blanco);
+            background: var(--naranja);
+            border: none;
+            padding: 0.5vmax 1vmax;
+            border-radius: 10px;
+        }
+    </style>
+    <form method="post">
+        {% if error %}
+            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        {% endif %}
+        <div class="contenedor_login">
+            <div class="div_login">¡Bienvenido!</div>
+            <div class="div_login">Por favor ingrese su usuario y contraseña a continuación</div>
+            <div class="div_login"> <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" required autofocus placeholder="usuario@mail.com"></div>
+            <div class="div_login"> <input type="password" name="password" id="inputPassword" class="form-control" required placeholder="************"></div>
+            <div class="div_login"><button class="btn btn-lg btn-primary" type="submit">INGRESAR</button></div>
+        </div>
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}" />
+    </form>
+    {#
+        Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
+        See https://symfony.com/doc/current/security/remember_me.html
+
+        <div class="checkbox mb-3">
+            <label>
+                <input type="checkbox" name="_remember_me"> Remember me
+            </label>
+        </div>
+    #}
+
+{% endblock %}

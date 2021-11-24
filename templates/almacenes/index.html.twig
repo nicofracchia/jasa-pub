@@ -1,0 +1,37 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Almacenes{% endblock %}
+
+{% block rutas %}<span>Almacenes</span>{% endblock %}
+
+{% block contenido %}
+    <div class='filtros'>
+        <a href="{{ path('almacenes_new') }}"><img src="{{asset('images/iconos/nuevo.png')}}" alt="" /></a>
+    </div>
+    <table class="tablaListados">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Direccion</th>
+                <th>acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for almacene in almacenes %}
+            <tr>
+                <td>{{ almacene.id }}</td>
+                <td>{{ almacene.nombre }}</td>
+                <td>{{ almacene.direccion }}</td>
+                <td>
+                    <a href="{{ path('almacenes_edit', {'id': almacene.id}) }}"><img src="{{asset('images/iconos/editar_off.png')}}" alt="" /></a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">No se encontraron almacenes.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,142 @@
+<form method="post" action="{{ path('movimientos_almacenes_envio', {'id': pedido.id}) }}">
+
+    <div>
+        <div>
+            <label>Productos solicitados</label>
+            <table class="tablaProductosAsignados">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody id='productosAsignadosPedido'>
+                    {% for p in productosAsignadosPedido %}
+                        <tr>
+                            <td>{{p.titulo}}</td>
+                            <td>{{p.cantidad}} {{p.unidad}}</td>
+                        </tr>
+                    {% endfor %}                
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <label>Productos</label>
+            {{ include('generales/busProductos.html.twig',{
+                'nombreCampoProducto' : '',
+                'busProductoSel' : '',
+                'busProductoSelTxt' : '',
+                'callbackCargar' : 'agregarProductoAPedido();'
+            }) }}
+        </div>
+        <div>
+            <label>Productos para enviar</label>
+            <table class="tablaProductosAsignados">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Stock actual</th>
+                        <th>Cantidad</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id='productosAsignadosEnvio'>
+                    {% for p in productosAsignadosEnvio %}
+                        <tr id="productoAgregado_{{p.id}}">
+                            <td>{{p.titulo}}</td>
+                            <td>{{p.stockActual ~ p.unidad}}</td>
+                            <td>
+                                <input 
+                                    type="number" 
+                                    placeholder="Cant." 
+                                    data-idproducto="{{p.id}}" 
+                                    data-cantidadanterior="{{p.cantidad}}" 
+                                    data-tipocampo="productoAsignado" 
+                                    name="productoAsignado[{{p.id}}]" 
+                                    value="{{p.cantidad}}"
+                                />
+                            </td>
+                            <td class="actions">
+                                <img src="/images/iconos/cancelar.svg" alt="Sacar producto" title="Sacar producto" onclick="sacarProductoPedido(this);" />
+                            </td>
+                        </tr>
+                    {% endfor %}                
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <input type="hidden" name="pedido[hacia]" value="{{ pedido.hacia.id }}" data-idBuscadorProductos="almacen">
+    <input type="hidden" name="_token" value="{{ csrf_token('enviar_pedido_'~pedido.id) }}">
+    <div class="botonesFormularios">
+        <a href="{{ path('movimientos_almacenes_index') }}" class='btn btnCancelar'>Cancelar</a>
+        <button class="btn btnGuardar" name='guardar' value='1'>Guardar</button>
+        <br/><br/>
+    </div>
+</form>
+
+<script>
+    function agregarProductoAPedido(){
+        let idProducto = document.getElementById('hiddenProductoId').value;
+        let idAlmacen = document.querySelector('[data-idBuscadorProductos="almacen"]').value;
+
+        let formData = new FormData();
+            formData.append("idProducto", idProducto);
+            formData.append("idAlmacen", idAlmacen);
+
+        fetch("{{ path('envios_productos') }}", {
+            method: 'post',
+            mode: 'cors',
+            credentials: 'same-origin',
+            body: formData
+        }).then(function(response){
+            return response.json();
+        }).then(function(json){
+            cargaProductoListado(json);
+            document.getElementById('buscador_productos').value = '';
+            document.getElementById('hiddenProductoId').value = '';
+        }).catch(function(error){
+            console.log('ERROR:', error);
+        })
+    }
+
+    function cargaProductoListado(json){
+        
+        if(document.getElementById('productoAgregado_'+json.id) === null){
+
+            let tr = document.createElement('tr');
+                tr.setAttribute('id', 'productoAgregado_'+json.id);
+            let td1 = document.createElement('td');
+                td1.innerHTML = json.titulo;
+            let td3 = document.createElement('td');
+                td3.innerHTML = json.stock + json.um
+            let td4 = document.createElement('td');
+            let td4_input = document.createElement('input');
+                td4_input.setAttribute('type', "number");
+                td4_input.setAttribute('placeholder', "Cant.");
+                td4_input.setAttribute('data-idProducto', json.id);
+                td4_input.setAttribute('data-cantidadAnterior', 0);
+                td4_input.setAttribute('data-tipoCampo', 'productoAsignado');
+                td4_input.setAttribute('name', 'productoAsignado['+json.id+']');
+            let td6 = document.createElement('td');
+            let td6_eliminar = document.createElement('img');
+                td6_eliminar.setAttribute('src', "{{asset('images/iconos/cancelar.svg')}}");
+                td6_eliminar.setAttribute('alt', "Sacar producto");
+                td6_eliminar.setAttribute('title', "Sacar producto");
+                td6_eliminar.onclick = function(){
+                    sacarProductoPedido(this);
+                };
+
+            tr.append(td1);
+            tr.append(td3);
+            td4.append(td4_input);
+            tr.append(td4);
+            td6.append(td6_eliminar);
+            tr.append(td6);
+            document.getElementById('productosAsignadosEnvio').prepend(tr);
+        }
+    }
+
+    function sacarProductoPedido(self){
+        self.parentElement.parentElement.remove();
+    }
+</script>

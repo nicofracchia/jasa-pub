@@ -1,0 +1,35 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Reportes{% endblock %}
+
+{% block rutas %}Reportes - <span>Ventas por medio de pago</span>{% endblock %}
+
+{% block contenido %}
+    <h1>Reporte medios de pago</h1>
+
+    {{ include('reportes/_scripts.html.twig') }}
+
+    <div class="contenedorReportes">
+        <div class="tablaReportes">
+            <table>
+                <tr>
+                    <th class='alIzq'>Fecha</th>
+                    <th class='alCen'>Medio de pago</th>
+                    <th class='alDer'>Monto</th>
+                    <th class='alCen'>Motivo</th>
+                    <th class='alIzq'>Observacions</th>
+                </tr>
+                {% for t in tabla %}
+                    <tr>
+                        <td class='alIzq'>{{t.fecha|date('d/m/Y H:i:s')}}</td>
+                        <td class='alCen'>{{t.medios_pago}}</td>
+                        <td class='alDer'>${{t.monto|number_format(0, ',', '.')}}</td>
+                        <td class='alCen'>{{t.motivo}}</td>
+                        <td class='alIzq'>{{t.observaciones}}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

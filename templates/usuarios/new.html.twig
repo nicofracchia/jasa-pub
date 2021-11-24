@@ -1,0 +1,17 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Usuarios{% endblock %}
+
+{% block rutas %}Usuarios > <span>Nuevo usuario</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('usuarios_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Datos del usuario</h1>
+
+    {{ include('usuarios/_form.html.twig', {'button_label': 'Guardar'}) }}
+{% endblock %}

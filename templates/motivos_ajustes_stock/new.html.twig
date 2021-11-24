@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New MotivosAjustesStock{% endblock %}
+
+{% block body %}
+    <h1>Create new MotivosAjustesStock</h1>
+
+    {{ include('motivos_ajustes_stock/_form.html.twig') }}
+
+    <a href="{{ path('motivos_ajustes_stock_index') }}">back to list</a>
+{% endblock %}

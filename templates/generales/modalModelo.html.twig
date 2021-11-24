@@ -1,0 +1,17 @@
+<div class='baseModal'>
+    <div class='contenidoModal'>
+        <input type="hidden" name="modalModelo_token" id="modalModelo_token" value="{{ csrf_token('nuevo_modelo') }}">
+        <div class='cerrarModal' onclick="oGen.fnCerrarModal(this);">
+            <img src="{{asset('images/iconos/cancelar.svg')}}" alt='Cerrar' title='Cerrar' />
+        </div>
+        <h1>Nuevo modelo</h1>
+        <div>
+            <label for="modalModelo_modelo">Modelo</label>
+            <input type="text" id="modalModelo_modelo" name="modalModelo[modelo]">
+        </div>
+        <div>
+            <label><br/></label>
+            <button class="btn btnGuardar" onclick="oRep.fnGuardaModeloModal()">Guardar</button>
+        </div>
+    </div>
+</div>

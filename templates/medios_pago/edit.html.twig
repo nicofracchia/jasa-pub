@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit MediosPago{% endblock %}
+
+{% block body %}
+    <h1>Edit MediosPago</h1>
+
+    {{ include('medios_pago/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('medios_pago_index') }}">back to list</a>
+
+    {{ include('medios_pago/_delete_form.html.twig') }}
+{% endblock %}

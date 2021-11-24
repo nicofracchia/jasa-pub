@@ -1,0 +1,199 @@
+<style>
+    #container form:first-of-type div:first-of-type .dp{display:none;}
+</style>
+<form method="POST" action="{{ path('ventas_pagos_guardar', {'id' : venta.id}) }}">
+    <div id="productos">
+        <div>
+            <label for="pago_nota" class="required">Nota de venta</label>
+            <select id="pago_nota" name="pago[nota]" required="required">
+                <option value="">Seleccionar...</option>
+                <option value="0">SF</option>
+                <option value="1">F</option>
+            </select>
+        </div>
+        <div></div>
+        <div>
+            <label style='display:none;' id='lblFinalizarVenta'> </label>
+            <div  style='display:none;' class="contCheckBox"  id='chkFinalizarVenta'>
+                <input type="checkbox" id="pago_finalizar_venta" name="pago[finalizar]" value="1" checked="checked">
+                <label for="pago_finalizar_venta">Finalizar venta</label>
+            </div>
+        </div>
+        <div>
+            <label for="pago_medio" class="required">Medio de pago</label>
+            <select id="pago_medio" name="pago[medio]" required="required" onchange="detallesMediosPago();calcularVuelto();calculaInteres();">
+                <option value="">Seleccionar...</option>
+                {% for mp in mediosPago %}
+                    <option value="{{mp.id}}">{{mp.nombre}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="pago_interes" id='label_interes'>Interes</label>
+            <input type="number" id="pago_interes" name="pago[interes]" placeholder="%" step=".01" value="0" onchange='calculaInteres();calcularVuelto();'>
+        </div>
+        <div>
+            <label for="pago_monto">Monto</label>
+            <input type="number" id="pago_monto" name="pago[monto]" placeholder="$" step=".01" value="0" onchange='calculaInteres();calcularVuelto();mostrarChkFinalizarVenta();'>
+            <label id="aCobrar">A corar: $0</label>
+        </div>
+        <!-- CAMPOS OCULTOS PARA DETALLES DE CADA MEDIO DE PAGO -->
+        <!-- EFECTIVO DP1 -->
+        <div class='dp dp1'>
+            <label for="dp1_ingreso">Calcular vuelto</label>
+            <input type="number" id="dp1_ingreso" name="dp1[ingreso]" placeholder="$" step=".01" value="0" onchange='calcularVuelto();'>
+            <label id='dp1_vuelto'>Vuelto: $0</label>
+        </div>
+        <!-- CHEQUE DP2 -->
+        <div class='dp dp2'>
+            <label for="dp2_numero">N° de cheque</label>
+            <input type="number" id="dp2_numero" name="dp2[numero]" placeholder="N° cheque" value="">
+        </div>
+        <div class='dp dp2'>
+            <label for="dp2_fecha_acreditacion">Fecha de acreditación</label>
+            <input type="date" id="dp2_fecha_acreditacion" name="dp2[fecha_acreditacion]" data-formateado="" onchange="setDateFormatArgentina(this);" value="">
+        </div>
+        <div class='dp dp2'>
+            <label for="dp2_banco">Banco</label>
+            <select id="dp2_banco" name="dp2[banco]">
+                <option value="">Seleccionar...</option>
+                {% for b in bancos %}
+                    <option value="{{b}}">{{b}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <!-- CUENTA CORRIENTE DP7 -->
+        <div class='dp dp7'>
+            <label for="dp7_dias">Plazo en dias</label>
+            <input type="number" id="dp7_dias" name="dp7[dias]" placeholder="Plazo" value="">
+        </div>
+        <!-- TRANSFERENCIA DP4 -->
+        <div class='dp dp4'>
+            <label for="dp4_numero">N° de transferencia</label>
+            <input type="number" id="dp4_numero" name="dp4[numero]" placeholder="N° de transferencia" value="">
+        </div>
+        <div class='dp dp4'>
+            <label for="dp4_banco">Banco</label>
+            <select id="dp4_banco" name="dp4[banco]">
+                <option value="">Seleccionar...</option>
+                {% for b in bancos %}
+                    <option value="{{b}}">{{b}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class='dp dp4'></div>
+        <!-- TARJETAS DP5 y DP6 -->
+        <div class='dp dp5 dp6'>
+            <label for="dp56_banco">Banco</label>
+            <select id="dp56_banco" name="dp56[banco]">
+                <option value="">Seleccionar...</option>
+                {% for b in bancos %}
+                    <option value="{{b}}">{{b}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class='dp dp5 dp6'>
+            <label for="dp56_entidad">Entidad</label>
+            <select id="dp56_entidad" name="dp56[entidad]">
+                <option value="">Seleccionar...</option>
+                {% for e in entidadesTarjetas %}
+                    <option value="{{e}}">{{e}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class='dp dp5 dp6'></div>
+        <!-- MERCADOPAGO DP3 -->
+        <div class='dp dp3'>
+            <label for="dp3_codop">Código de operación</label>
+            <input type="text" id="dp3_codop" name="dp3[codop]" placeholder="Código de operacón" value="">
+        </div>
+        <div class='dp dp3'>
+            <label for="dp3_link">Link de pago</label>
+            <input type="text" id="dp3_link" name="dp3[link]" placeholder="Link de pago" value="">
+        </div>
+        <div class='dp dp3'></div>
+        <!-- FIN DETALLE MEDIOS DE PAGO -->
+
+        <div>
+            <label for="pago_observaciones">Observaciones</label>
+            <input type="text" id="pago_observaciones" name="pago[observaciones]" placeholder="observaciones" value="">
+        </div>
+    </div>
+    <input type="hidden" name="_token" value="{{ csrf_token('nuevo_pago_' ~ venta.id) }}">
+    <div class="botonesFormularios">
+        <a href="{{ path('ventas_index') }}" class='btn btnCancelar'>Cancelar</a>
+        <button class="btn btnGuardar">{{ button_label|default('Guardar') }}</button>
+    </div>
+</form>
+<script>
+    setDateFormatArgentina = function(el){
+        let val = el.value.split('-');
+        if(val.length > 1){
+            fechaFormateada = val[2]+'/'+val[1]+'/'+val[0];
+            el.setAttribute('data-formateado', fechaFormateada);
+        }
+    }
+    document.querySelectorAll('input[type=date]').forEach(setDateFormatArgentina);
+    function detallesMediosPago(){
+        let mp = document.getElementById('pago_medio').value;
+        document.querySelectorAll('.dp').forEach(function(el){
+            el.style.display = 'none';
+        });
+        document.querySelectorAll('.dp input').forEach(function(el){
+            el.required = false;
+        });
+        document.querySelectorAll('.dp select').forEach(function(el){
+            el.required = false;
+        });
+        if(mp != ''){
+            document.querySelectorAll('.dp'+mp).forEach(function(el){
+                el.style.display = 'flex';
+            });
+            document.querySelectorAll('.dp'+mp+' input').forEach(function(el){
+                el.required = true;
+            });
+            document.querySelectorAll('.dp'+mp+' select').forEach(function(el){
+                el.required = true;
+            })
+        }
+        if (document.getElementById('pago_medio').value == 1)
+            document.getElementById('label_interes').innerHTML = 'Descuento';
+        else
+            document.getElementById('label_interes').innerHTML = 'Interés';
+    }
+    function  calculaInteres(){
+        let int = parseFloat(document.getElementById('pago_interes').value);
+        if (document.getElementById('pago_medio').value == 1)
+            int *= -1;
+        let mon = parseFloat(document.getElementById('pago_monto').value);
+        let pago = mon + mon * int / 100;
+        document.getElementById('aCobrar').innerHTML = "A cobrar: $"+pago;
+    }
+    function calcularVuelto(){
+        let mp = document.getElementById('pago_medio').value;
+        if(mp == 1){
+            let imp = parseFloat(document.getElementById('pago_interes').value);
+            let mon = parseFloat(document.getElementById('pago_monto').value);
+            let pago = mon + mon * imp / 100 * -1;
+            let ing = parseFloat(document.getElementById('dp1_ingreso').value);
+            let vuelto = ing - pago;
+            if(vuelto < 0)
+                vuelto = 0;
+                
+            document.getElementById('dp1_vuelto').innerHTML = "Vuelto: $"+vuelto;
+        }
+    }
+    function mostrarChkFinalizarVenta(){
+        let monto = document.getElementById('pago_monto').value;
+        let pendiente = {{pendiente}};
+
+        if(monto == pendiente){
+            document.getElementById('chkFinalizarVenta').style.display = 'block';
+            document.getElementById('lblFinalizarVenta').style.display = 'block';
+        }else{
+            document.getElementById('chkFinalizarVenta').style.display = 'none';
+            document.getElementById('lblFinalizarVenta').style.display = 'none';
+        }
+    }
+    mostrarChkFinalizarVenta();
+</script> 

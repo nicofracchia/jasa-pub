@@ -1,0 +1,218 @@
+{% set clienteCompleto = reparacion.cliente.dni ?? '' ~ ' - ' ~ reparacion.cliente.apellido ?? '' ~ ', ' ~ reparacion.cliente.nombre ?? '' %}
+{% set edicion = (reparacion is defined) ? true : false %}
+{% set almacenSel = reparacion.almacen.id ?? '' %}
+{% set articuloSel = reparacion.articulo ?? '' %}
+{% set marcaSel = reparacion.marca ?? '' %}
+{% set modeloSel = reparacion.modelo ?? '' %}
+{% set tareaSel = reparacion.tarea ?? '' %}
+
+<div>
+    <div>
+        <label for="reparacion_almacen" class="required">Almacen</label>
+        {% if app.user.almacen.id != 1 %}
+            <input type='hidden' id="reparacion_almacen" name="reparacion[almacen]" data-idBuscadorProductos="almacen" value='{{app.user.almacen.id}}' />
+            {{app.user.almacen.nombre}}
+        {% else %}
+            <select id="reparacion_almacen" name="reparacion[almacen]" required="required" data-idBuscadorProductos="almacen">
+                <option value="">Seleccionar...</option>
+                {% for almacen in almacenes %}
+                    <option value="{{almacen.id}}" {{ (almacenSel == almacen.id) ? 'selected' : '' }}>{{almacen.nombre}} - {{almacen.direccion}}</option>
+                {% endfor %}
+            </select>
+        {% endif %}
+    </div>
+    <div></div><div></div>
+    <div>
+        <label for="reparacion_articulo" class="required">Artículo</label>
+        <select id="reparacion_articulo" name="reparacion[articulo]" required="required">
+            <option value="">Seleccionar...</option>
+            <option {{ (articuloSel == 'Impresora') ? 'selected' }}>Impresora</option>
+            <option {{ (articuloSel == 'Plancha') ? 'selected' }}>Plancha</option>
+        </select>
+    </div>
+    <div>
+        <label>
+            Cliente
+            <img src="{{asset('images/iconos/nuevo.svg')}}" class='btnNuevoModal' alt="Nuevo cliente" title="Nuevo cliente" onclick="oGen.fnCargaModal('{{path('clientes_modal')}}')" />
+        </label>
+        {{ include('generales/busCliente.html.twig',{
+            'nombreCampoCliente' : 'reparacion[cliente]',
+            'busClienteSel' : reparacion.cliente.id ?? '',
+            'busClienteSelTxt' : (edicion) ? clienteCompleto : ''
+        }) }}
+    </div>
+    <div>
+        <label>Datos del cliente</label>
+        <table id='datosCliente' {{ (edicion) ?: "style='display:none;'" }}>
+            <tr>
+                <th>Razón social</th>
+                <td id='cliente_rs'>{{reparacion.cliente.razonSocial ?? ''}}</td>
+            </tr>
+            <tr>
+                <th>Nombre y apellido</th>
+                <td id='cliente_nya'>{{reparacion.cliente.nombre ?? '' ~ ' ' ~ reparacion.cliente.apellido ?? ''}}</td>
+            </tr>
+            <tr>
+                <th>DNI</th>
+                <td id='cliente_dni'>{{reparacion.cliente.dni ?? ''}}</td>
+            </tr>
+            <tr>
+                <th>Dirección</th>
+                <td id='cliente_dir'>{{reparacion.cliente.direccion ?? ''}}</td>
+            </tr>
+            <tr>
+                <th>Teléfono</th>
+                <td id='cliente_tel'>{{reparacion.cliente.telefono ?? ''}}</td>
+            </tr>
+            <tr>
+                <th>Mail</th>
+                <td id='cliente_mail'>{{reparacion.cliente.mail ?? ''}}</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <label for="reparacion_marca" class="required">
+            Marca
+            <img src="{{asset('images/iconos/nuevo.svg')}}" class='btnNuevoModal' alt="Nueva marca" title="Nueva marca" onclick="oGen.fnCargaModal('{{path('marcas_modal')}}')" />
+        </label>
+        <select id="reparacion_marca" name="reparacion[marca]" required="required">
+            <option value="">Seleccionar...</option>
+            {% for marca in marcas %}
+                <option {{ (marcaSel == marca.marca) ? 'selected' }}>{{marca.marca}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <label for="reparacion_modelo" class="required">
+            Modelo
+            <img src="{{asset('images/iconos/nuevo.svg')}}" class='btnNuevoModal' alt="Nuevo modelo" title="Nuevo modelo" onclick="oGen.fnCargaModal('{{path('modelos_modal')}}')" />
+        </label>
+        <select id="reparacion_modelo" name="reparacion[modelo]" required="required">
+            <option value="">Seleccionar...</option>
+            {% for modelo in modelos %}
+                <option {{ (modeloSel == modelo.modelo) ? 'selected' }}>{{modelo.modelo}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <label for="reparacion_serial" class="required">N° de serie</label>
+        <input type="text" id="reparacion_serial" name="reparacion[serial]" required="required" value="{{reparacion.serial ?? ''}}" />
+    </div>
+    <div>
+        <label>Tintas</label>
+        <table>
+            <tr>
+                <td>C</td>
+                <td><input type="number" id="reparacion_tintac" name="reparacion[tintac]" value="{{reparacion.tintaC ?? ''}}" placeholder='%' /></td>
+                <td>CL</td>
+                <td><input type="number" id="reparacion_tintacl" name="reparacion[tintacl]" value="{{reparacion.tintaCl ?? ''}}" placeholder='%' /></td>
+            </tr>
+            <tr>
+                <td>M</td>
+                <td><input type="number" id="reparacion_tintam" name="reparacion[tintam]" value="{{reparacion.tintaM ?? ''}}" placeholder='%' /></td>
+                <td>ML</td>
+                <td><input type="number" id="reparacion_tintaml" name="reparacion[tintaml]" value="{{reparacion.tintaMl ?? ''}}" placeholder='%' /></td>
+            </tr>
+            <tr>
+                <td>Y</td>
+                <td><input type="number" id="reparacion_tintay" name="reparacion[tintay]" value="{{reparacion.tintaY ?? ''}}" placeholder='%' /></td>
+                <td>BK</td>
+                <td><input type="number" id="reparacion_tintabk" name="reparacion[tintabk]" value="{{reparacion.tintaBk ?? ''}}" placeholder='%' /></td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <label for="reparacion_tarea" class="required">
+            Tarea
+            <img src="{{asset('images/iconos/nuevo.svg')}}" class='btnNuevoModal' alt="Nueva tarea" title="Nueva tarea" onclick="oGen.fnCargaModal('{{path('tareas_modal')}}')" />
+        </label>
+        <select id="reparacion_tarea" name="reparacion[tarea]" required="required">
+            <option value="">Seleccionar...</option>
+            {% for tarea in tareas %}
+                <option {{ (tareaSel == tarea.tarea) ? 'selected' }}>{{tarea.tarea}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <label for="reparacion_reporte" class="required">Reporte</label>
+        <textarea id="reparacion_reporte" name="reparacion[reporte]" required="required">{{reparacion.reporte ?? ''}}</textarea>
+    </div>
+    <div></div>
+    <div>
+        <label for="reparacion_sena" class="required">Seña</label>
+        <input type="number" step=".01" id="reparacion_sena" name="reparacion[sena]" required="required" value="{{reparacion.sena ?? ''}}" placeholder='$'/>
+    </div>
+    <div>
+        <label for="reparacion_estimado" class="required">Presupuesto estimado</label>
+        <input type="number" step=".01" id="reparacion_estimado" name="reparacion[estimado]" required="required" value="{{reparacion.presupuestoInicial ?? ''}}" placeholder='$'/>
+    </div>
+</div>
+<input type="hidden" name="_token" value="{{ (edicion) ? csrf_token('editar_ingreso_'~reparacion.id) : csrf_token('nuevo_ingreso') }}">
+<div class="botonesFormularios">
+    <a href="{{ path('reparaciones_index') }}" class='btn btnCancelar'>Cancelar</a>
+    <button class="btn btnGuardar" name='guardar' value='1'>Guardar</button>
+    <br/><br/>
+    <button class="btn btnGuardar" name='guardar' value='2'>Guardar y cargar imágenes</button>
+    <br/><br/>
+    <button class="btn btnGuardar" name='guardar' value='3'>Guardar y cargar pagos</button>
+    <br/><br/>
+    <button class="btn btnGuardar" name='guardar' value='4'>Guardar y ver órden de reparación</button>
+</div>
+
+
+<script>
+    document.getElementById('hiddenClienteId').addEventListener('change',function(self){
+        document.getElementById('datosCliente').style.display = 'none';
+        let ID = this.value;
+        if(ID > 0){
+            let formData = new FormData();
+            formData.append("ID", ID);
+
+            fetch("{{ path('clientes_buscar_id') }}", {
+                method: 'post',
+                mode: 'cors',
+                credentials: 'same-origin',
+                body: formData
+            }).then(function(response){
+                return response.json();
+            }).then(function(json){
+                muestraDatosCliente(json);
+            }).catch(function(error){
+                console.log('ERROR:', error);
+            })
+        }
+    });
+
+    function muestraDatosCliente(cliente){
+        if(typeof cliente !== 'undefined'){
+            if(typeof cliente.mensaje === 'undefined'){
+                document.getElementById('datosCliente').style.display = 'table';
+                document.getElementById('cliente_rs').innerHTML = cliente.razonSocial;
+                document.getElementById('cliente_nya').innerHTML = cliente.nombre + ' ' + cliente.apellido;
+                document.getElementById('cliente_dni').innerHTML = cliente.dni;
+                document.getElementById('cliente_dir').innerHTML = cliente.direccion;
+                document.getElementById('cliente_tel').innerHTML = cliente.telefono;
+                document.getElementById('cliente_mail').innerHTML = cliente.mail;
+            }
+        }
+    }
+
+</script>
+
+<style>
+    #datosCliente th{
+        text-align: left;
+    }
+    #datosCliente tr:hover th,
+    #datosCliente tr:hover td{
+        background: var(--naranjaop);
+    }
+    #reparacion_tintac,
+    #reparacion_tintacl,
+    #reparacion_tintam,
+    #reparacion_tintaml,
+    #reparacion_tintay,
+    #reparacion_tintabk{
+        width:5vmax;
+    }
+</style>

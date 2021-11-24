@@ -1,0 +1,45 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Reportes{% endblock %}
+
+{% block rutas %}Reportes - <span>Ventas por producto</span>{% endblock %}
+
+{% block contenido %}
+    <h1>Reporte productos</h1>
+
+    {{ include('reportes/_scripts.html.twig') }}
+
+    <div class="contenedorReportes">
+        <div class="tablaReportes">
+            <table>
+                <tr>
+                    <th class='alIzq'>Producto</th>
+                    <th class='alDer'>Cantidad</th>
+                    <th class='alDer'>Costo</th>
+                    <th class='alDer'>Precio</th>
+                </tr>
+                {% for t in tabla %}
+                    <tr>
+                        <td class='alIzq'>{{t.titulo}}</td>
+                        <td class='alDer'>{{t.cantidad|number_format(0, ',', '.')}} {{t.unidad_medida}}</td>
+                        <td class='alDer'>${{t.costo|number_format(0, ',', '.')}}</td>
+                        <td class='alDer'>${{t.precio|number_format(0, ',', '.')}}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+        
+        <div class="graficoReportes" id="grafico"></div>
+
+    </div>
+
+    {{ include('reportes/_barras.html.twig', {
+        'titulo': 'Productos',
+        'subtitulo': '',
+        'ejeY': 'Productos (%)',
+        'categorias': categoriasGrafico,
+        'series': dataGrafico,
+        'simboloPaintFormat': ''
+    }) }}
+
+{% endblock %}

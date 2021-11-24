@@ -1,0 +1,115 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Reportes{% endblock %}
+
+{% block rutas %}<span>Reportes</span>{% endblock %}
+
+{% block contenido %}
+   <h1>Reportes</h1>
+   <form method="post" action="{{ path('reportes_index') }}">
+      <div id="productos">
+         <div>
+            <label for="desde" class="required">Fecha desde</label>
+            <input type="date" id="desde" name="reporte[desde]" required="required" data-formateado="" onchange="setDateFormatArgentina(this);" value="{{ '2020-01-01'|date("Y-m-d") }}">
+         </div>
+         <div>
+            <label for="hasta" class="required">Fecha hasta</label>
+            <input type="date" id="hasta" name="reporte[hasta]" required="required" data-formateado="" onchange="setDateFormatArgentina(this);" value="{{ 'now'|date("Y-m-d") }}">
+         </div>
+         <div></div>
+         <input type="hidden" name="_token" value="{{ csrf_token('ver_reportes') }}">
+         
+         <div class='seccionReportes'>Caja diaria</div>
+         <div class="seleccionReporte">
+            <button class="btn btnGuardar" name='reporte[reporte]' value='1'>Caja diaria</button>
+         </div>
+         <div class='seccionReportes'>Medios de pago</div>
+         <div class="seleccionReporte">
+            <div>
+               <label>
+                     Filtrar medio de pago:
+               </label>
+               <select name='reporte[medio_pago]'>
+                  <option value=''>Seleccionar</option>
+                  <option value='1'>Efectivo</option>
+                  <option value='2'>Cheque</option>
+                  <option value='3'>Mercado Pago</option>
+                  <option value='4'>Transferencia</option>
+                  <option value='5'>Tarjeta de Débito</option>
+                  <option value='6'>Tarjeta de Crédito</option>
+                  <option value='7'>Cuenta Corriente</option>
+               </select>
+            </div>
+            <div></div><div></div>
+            <button class="btn btnGuardar" name='reporte[reporte]' value='2'>Ventas por medio de pago (totales)</button>
+            <button class="btn btnGuardar" name='reporte[reporte]' value='8'>Ventas por medio de pago (detalle)</button>
+            <div></div>
+         </div>
+         <div class='seccionReportes'>Usuarios</div>
+         <div class="seleccionReporte">
+            <button class="btn btnGuardar" name='reporte[reporte]' value='3'>Ventas por usuario</button>
+         </div>
+         <div class='seccionReportes'>Clientes</div>
+         <div class="seleccionReporte">
+            <div>
+               <label>
+                     Filtrar cliente:
+               </label>
+               {{ include('generales/busCliente.html.twig',{
+                     'nombreCampoCliente' : 'reporte[cliente]',
+                     'busClienteSel' : '',
+                     'busClienteSelTxt' : ''
+               }) }}
+            </div>
+            <div></div><div></div>
+            <button class="btn btnGuardar" name='reporte[reporte]' value='4'>Totales</button>
+            <button class="btn btnGuardar" name='reporte[reporte]' value='7'>Detallado</button>
+            <div></div>
+         </div>
+         <div class='seccionReportes'>Productos</div>
+         <div class="seleccionReporte">
+            <button class="btn btnGuardar" name='reporte[reporte]' value='5'>Ventas por producto</button>
+         </div>
+         <div class='seccionReportes'>Movimientos</div>
+         <div class="seleccionReporte">
+            <div>
+               <label>Filtrar productos</label>
+               <input type='hidden' data-idBuscadorProductos="almacen" value='0' />
+               {{ include('generales/busProductos.html.twig',{
+                  'nombreCampoProducto' : 'reporte[producto]',
+                  'busProductoSel' : '',
+                  'busProductoSelTxt' : '',
+                  'callbackCargar' : ''
+               }) }}
+            </div>
+            <div>
+               <label>
+                     Filtrar usuario:
+               </label>
+               <select name='reporte[usuario]'>
+                  <option value=''>TODOS</option>
+                  {% for u in usuarios %}
+                     <option value='{{u.id}}'>{{u.nombre}} {{u.apellido}}</option>
+                  {% endfor %}
+               </select>
+            </div>
+            <div></div>
+            <button class="btn btnGuardar" name='reporte[reporte]' value='6'>Pagos</button>
+            <button class="btn btnGuardar" name='reporte[reporte]' value='9'>Productos / usuarios</button>
+            <div></div>
+         </div>
+      </div>
+   </form>
+
+   <script>
+      setDateFormatArgentina = function(el){
+         let val = el.value.split('-');
+         if(val.length > 1){
+            fechaFormateada = val[2]+'/'+val[1]+'/'+val[0];
+            el.setAttribute('data-formateado', fechaFormateada);
+         }
+      }
+      document.querySelectorAll('input[type=date]').forEach(setDateFormatArgentina);
+    </script>
+
+{% endblock %}

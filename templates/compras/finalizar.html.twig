@@ -1,0 +1,49 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Órdenes de compra{% endblock %}
+
+{% block rutas %}Órdenes de compra > <span>Finalizar orden de compra</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('compras_edit', {'id': compra.id}) }}">Detalles de la orden</a>
+    <a href="{{ path('compras_productos', {'id': compra.id}) }}">Productos de la orden</a>
+    <a href="{{ path('compras_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    {% set fechaRecepcion = compra.recepcion ?? 'now' %}
+
+
+    <h1>Finalizar orden de compra</h1>
+    <br/><br/><br/><br/>
+    <div><b>Fecha de pedido:</b> {{compra.fecha|date("d/m/Y")}}</div><br/>
+    <div><b>Fecha de recepcion:</b> {{fechaRecepcion|date("d/m/Y")}}</div><br/>
+    <div><b>Almacen:</b> {{compra.almacen.nombre}}</div><br/>
+    <div><b>Proveedor:</b> {{compra.proveedor.nombre}}</div><br/>
+    <div><b>Realizado por:</b> {{compra.creador.nombre ~ ' ' ~ compra.creador.apellido}}</div><br/>
+    <div><b>Productos:</b></div><br/>
+    <table class='tablaListados'>
+        <tr>
+            <th>ID</th>
+            <th>Código de barras</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+        </tr>
+        {% for producto in productos %}
+            <tr>
+                <td style='text-align:center;'>{{producto.id}}</td>
+                <td style='text-align:center;'>{{producto.codigo}}</td>
+                <td style='text-align:center;'>{{producto.titulo}}</td>
+                <td style='text-align:center;'>{{producto.cantidad ~ ' ' ~ producto.unidad}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    
+    <br/><br/><br/><br/>
+    <form method="post" action="{{ path('compras_finalizar', {'id' : compra.id}) }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('finalizar_compra_'~compra.id) }}">
+        <button class="btn btnGuardar" name='guardar' style='background-color:var(--celeste);'>Confirmar y actualizar stock</button>
+    </form>
+{% endblock %}

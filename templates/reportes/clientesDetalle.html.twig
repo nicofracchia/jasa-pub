@@ -1,0 +1,42 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Reportes{% endblock %}
+
+{% block rutas %}Reportes - <span>Ventas por cliente</span>{% endblock %}
+
+{% block contenido %}
+    <h1>Reporte clientes</h1>
+
+    {{ include('reportes/_scripts.html.twig') }}
+
+    <div class="contenedorReportes">
+        <div class="tablaReportes">
+            <table>
+                <tr>
+                    <th class='alIzq'>Fecha</th>
+                    <th class='alIzq'>Cliente</th>
+                    <th class='alIzq'>Motivo</th>
+                    <th class='alIzq'>Medio de pago</th>
+                    <th class='alIzq'>Monto</th>
+                    <th class='alDer'>Usuario</th>
+                    <th class='alIzq'>Observaciones</th>
+                </tr>
+                {% for t in tabla %}
+                    <tr>
+                        <td class='alIzq'>{{t.fecha|date('d/m/Y H:i:s')}}</td>
+                        <td class='alIzq'>
+                            {{ (t.cliente_rs != '') ? t.cliente_rs ~ ' - '}}
+                            {{t.cliente_nombre}} {{t.cliente_apellido}}
+                        </td>
+                        <td class='alIzq'>{{t.motivo}}</td>
+                        <td class='alIzq'>{{t.medio_pago}}</td>
+                        <td class='alIzq'>${{t.monto|number_format(0, ',', '.')}}</td>
+                        <td class='alDer'>{{t.usuario_nombre}} {{t.usuario_apellido}}</td>
+                        <td class='alIzq'>{{t.observaciones}}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

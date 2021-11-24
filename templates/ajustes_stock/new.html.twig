@@ -1,0 +1,96 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Productos{% endblock %}
+
+{% block rutas %}Productos > <span>Editar producto > Ajustes de stock</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('productos_edit_manual', {'id': producto.id}) }}">Detalles de producto</a>
+    <a href="{{ path('productos_imagenes', {'id': producto.id}) }}">Imágenes</a>
+    <a href="{{ path('ajustes_stock_nuevo', {'id_producto': producto.id}) }}" class="actual">Ajustes de stock</a>
+    <a href="{{ path('productos_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Ajustes de stock</h1>
+
+    {{ include('ajustes_stock/_form.html.twig') }}
+
+    <h2>Historial de ajustes de stock</h2>
+
+    <table class='tablaListados'>
+        <thead>
+            <tr>
+                <th>FECHA</th>
+                <th>Q ANTERIOR</th>
+                <th>AJUSTE/MERMA</th>
+                <th>Q FINAL</th>
+                <th>MOTIVO</th>
+                <th>OBSERVACIONES</th>
+                <th>USUARIO</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for aj in listadoAjustes %}
+                {% set color = (aj.cantidad < 0) ? "red" : "green" %}
+                {% set cant = (aj.cantidad < 0) ? aj.cantidad * -1 : aj.cantidad %}
+                {% set qFinal = aj.stockAnterior + aj.cantidad %}
+                <tr>
+                    <td>{{aj.fecha|date('d/m/Y')}}</td>
+                    <td>{{aj.stockAnterior}}</td>
+                    <td><span style="color:{{color}}">{{cant}}</span></td>
+                    <td>{{qFinal}}</td>
+                    <td>{{aj.motivo.nombre}}</td>
+                    <td>{{aj.observaciones}}</td>
+                    <td>{{aj.usuario.email}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        function cambioAlmacen(self){
+            let stockActual = self.options[self.selectedIndex].getAttribute('data-stock');
+            let costo = document.querySelector('#ajuste_costo_stock_actual').value;
+            let precio = document.querySelector('#ajuste_precio_stock_actual').value;
+            let costoInfo = Number(parseFloat(stockActual) * parseFloat(costo)).toLocaleString('es');
+            let precioInfo = Number(parseFloat(stockActual) * parseFloat(precio)).toLocaleString('es');
+
+
+            document.querySelector('#ajuste_stock_actual').value = stockActual;
+            document.querySelector('#stockActualInfo').innerHTML = stockActual;
+            document.querySelector('#costoActualInfo').innerHTML = costoInfo;
+            document.querySelector('#precioActualInfo').innerHTML = precioInfo;
+
+            document.querySelector('#ajuste_merma').value = 0;
+            document.querySelector('#ajuste_stock_real').value = 0;
+            document.querySelector('#ajuste_motivo').value = "";
+            document.querySelector('#ajuste_merma').value = "";
+        }
+        function stockSegunMerma(){
+            let motivo = document.querySelector('#ajuste_motivo');
+            let tipo = motivo.options[motivo.selectedIndex].text.split('(-)').length;
+            let merma = document.querySelector('#ajuste_merma').value;
+            let stockActual = document.querySelector('#ajuste_stock_actual').value;
+            let stockReal = 0;
+            if(tipo == 2)
+                stockReal = parseInt(stockActual) - parseInt(merma);
+            else
+                stockReal = parseInt(stockActual) + parseInt(merma);
+
+            if(stockReal < 0)
+                stockReal = 0;
+
+                
+            document.querySelector('#ajuste_stock_real').value = stockReal;
+        }
+        function mermaSegunStock(){
+            let stockReal = document.querySelector('#ajuste_stock_real').value;
+            let stockActual = document.querySelector('#ajuste_stock_actual').value;
+            let merma = parseInt(stockReal) - parseInt(stockActual);
+            document.querySelector('#ajuste_merma').value = merma;
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Cotizador{% endblock %}
+
+{% block rutas %}<span>Cotizador</span>{% endblock %}
+
+{% block contenido %}
+
+    <div class='filtros'>
+        <a href="{{ path('cotizaciones_new') }}"><img src="{{asset('images/iconos/nuevo.png')}}" alt="" /></a>
+    </div>
+    <table class="tablaListados">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Creador</th>
+                <th>Almacen</th>
+                <th>Estado</th>
+                <th>Costo</th>
+                <th>Precio final</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for cotizacion in cotizaciones %}
+            <tr>
+                <td>{{ cotizacion.id }}</td>
+                <td>{{ cotizacion.fecha ? cotizacion.fecha|date('d/m/Y') : '' }} - {{ cotizacion.hasta ? cotizacion.hasta|date('d/m/Y') : '' }}</td>
+                <td>{{ cotizacion.idCliente.apellido ?? ''}} {{cotizacion.idCliente.nombre ?? '' }}</td>
+                <td>{{ cotizacion.creador.apellido ~ ' ' ~ cotizacion.creador.nombre }}</td>
+                <td>{{ cotizacion.almacen }}</td>
+                <td>{{ cotizacion.estado }}</td>
+                <td>${{ cotizacion.costo|number_format(0, ',', '.') }}</td>
+                <td>${{ cotizacion.precio|number_format(0, ',', '.') }}</td>
+                <td style='text-align:right;'>
+                    {% if (cotizacion.estado != 'Finalizada') %}
+                        <a href="{{ path('cotizaciones_edit', {'id': cotizacion.id}) }}"><img src="{{asset('images/iconos/editar_off.png')}}" alt="" /></a>
+                        <a href="{{ path('cotizaciones_venta', {'id': cotizacion.id}) }}"><img src="{{asset('images/iconos/editar-pagos_off.png')}}" alt="" title="Generar venta" /></a>
+                    {% else %}
+                        <a href="{{ path('cotizaciones_show', {'id': cotizacion.id}) }}"><img src="{{asset('images/iconos/ver-comprobante_off.png')}}" alt="" title="Ver cotización" style='width:16px;' /></a>
+                    {% endif %}
+                    <a href="{{ path('cotizaciones_xls', {'id': cotizacion.id}) }}"><img src="{{asset('images/iconos/xls.png')}}" alt="" title="Exportar a excel" /></a>
+                    <a href="{{ path('public_pdf_cotizaciones', {'slug': cotizacion.slug}) }}" target='_blank'><img src="{{asset('images/iconos/pdf.svg')}}" alt="" title="Ver en PDF" /></a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">No se encontraron cotizaciones.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

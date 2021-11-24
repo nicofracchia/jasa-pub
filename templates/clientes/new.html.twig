@@ -1,0 +1,17 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Clientes{% endblock %}
+
+{% block rutas %}Clientes > <span>Nuevo cliente</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('clientes_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Datos del cliente</h1>
+
+    {{ include('clientes/_form.html.twig', {'button_label': 'Guardar'}) }}
+{% endblock %}

@@ -1,0 +1,351 @@
+
+{% set fecha = cotizacion.fecha ?? "now" %}
+{% set hasta = cotizacion.hasta ?? fecha|date_modify("+7 day") %}
+{% set estadoSel = cotizacion.estado ?? '' %}
+{% set almacenSel = cotizacion.almacen.id ?? 0 %}
+{% set mantenerPrecioSel = cotizacion.mantenerPrecio ?? false %}
+{% set edicion = (cotizacion is defined) ? true : false %}
+
+
+
+<div>
+    {% if (mensajeError is defined) %}
+        {% if (mensajeError != '') %}
+            <div class='mensajesError'>
+                <ul>
+                    {% for error in mensajeError %}
+                        <li>{{error}}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    {% endif %}
+    <div>
+        <label for="cotizacion_almacen" class="required">Almacen</label>
+        {% if app.user.almacen.id != 1 %}
+            <input type='hidden' id="cotizacion_almacen" name="cotizacion[almacen]" data-idBuscadorProductos="almacen" value='{{app.user.almacen.id}}' />
+            {{app.user.almacen.nombre}}
+        {% else %}
+            <select id="cotizacion_almacen" name="cotizacion[almacen]" required="required" data-idBuscadorProductos="almacen">
+                <option value="">Seleccionar...</option>
+                {% for almacen in almacenes %}
+                    <option value="{{almacen.id}}" {{ (almacenSel == almacen.id) ? 'selected' : '' }}>{{almacen.nombre}} - {{almacen.direccion}}</option>
+                {% endfor %}
+            </select>
+        {% endif %}
+    </div>
+    <div></div>
+    <div></div>
+    <div>
+        <label for="cotizacion_desde" class="required">Fecha</label>
+        <input type="date" id="cotizacion_desde" name="cotizacion[desde]" required="required" data-formateado="" onchange="setDateFormatArgentina(this);" value="{{ fecha|date("Y-m-d") }}">
+    </div>
+    <div>
+        <label for="cotizacion_hasta">Válido hasta</label>
+        <input type="date" id="cotizacion_hasta" name="cotizacion[hasta]" data-formateado="" onchange="setDateFormatArgentina(this);" value="{{ hasta|date("Y-m-d") }}">
+    </div>
+    <div>
+        <label for="cotizacion_estado">Estado</label>
+        <select id="cotizacion_estado" name="cotizacion[estado]">
+            <option {{ (estadoSel == "Espera respuesta") ? 'selected' : '' }}>Espera respuesta</option>
+            <option {{ (estadoSel == "Aceptado") ? 'selected' : '' }}>Aceptado</option>
+            <option {{ (estadoSel == "Rechazado") ? 'selected' : '' }}>Rechazado</option>
+        </select>
+    </div>
+    <div>
+        <label></label>
+        <div class="contCheckBox">
+            <input type="checkbox" id="cotizacion_mantener_precio" name="cotizacion[mantener_precio]" value="1" {{ (mantenerPrecioSel) ? 'checked' : '' }}>
+            <label for="cotizacion_mantener_precio">Mantener el precio</label>
+        </div>
+    </div>
+    <div></div>
+    <div></div>
+    <div>
+        <label>
+            Cliente
+            <img src="{{asset('images/iconos/nuevo.svg')}}" class='btnNuevoModal' alt="Nuevo cliente" title="Nuevo cliente" onclick="oGen.fnCargaModal('{{path('clientes_modal')}}')" />
+        </label>
+        {{ include('generales/busCliente.html.twig',{
+            'nombreCampoCliente' : 'cotizacion[cliente]',
+            'busClienteSel' : cotizacion.idCliente.id ?? '',
+            'busClienteSelTxt' : (edicion) ? clienteCompleto : ''
+        }) }}
+    </div>
+    <div style='width:60%;'>
+        <label>Datos del cliente</label>
+        <table id='datosCliente' {{ (edicion) ?: "style='display:none;'" }}>
+            <tr>
+                <th>Razón social</th>
+                <td id='cliente_rs'>{{cotizacion.idCliente.razonSocial ?? ''}}</td>
+            </tr>
+            <tr>
+                <th>Nombre y apellido</th>
+                <td id='cliente_nya'>{{cotizacion.idCliente.nombre ?? '' ~ ' ' ~ cotizacion.idCliente.apellido ?? ''}}</td>
+            </tr>
+            <tr>
+                <th>DNI</th>
+                <td id='cliente_dni'>{{cotizacion.idCliente.dni ?? ''}}</td>
+            </tr>
+            <tr>
+                <th>Dirección</th>
+                <td id='cliente_dir'>{{cotizacion.idCliente.direccion ?? ''}}</td>
+            </tr>
+            <tr>
+                <th>Teléfono</th>
+                <td id='cliente_tel'>{{cotizacion.idCliente.telefono ?? ''}}</td>
+            </tr>
+            <tr>
+                <th>Mail</th>
+                <td id='cliente_mail'>{{cotizacion.idCliente.mail ?? ''}}</td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <label>Productos</label>
+        {{ include('generales/busProductos.html.twig',{
+            'nombreCampoProducto' : '',
+            'busProductoSel' : '',
+            'busProductoSelTxt' : '',
+            'callbackCargar' : 'agregarProductoACotizacion();'
+        }) }}
+    </div>
+    <div style='width:60%'>
+        <label>Productos asignados</label>
+        <table class="tablaProductosAsignados">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Precio</th>
+                    <th>Stock actual</th>
+                    <th>Cantidad</th>
+                    <th>Reserva stock</th>
+                    <th>Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id='productosAsignadosCotizacion'>
+                {% for p in productosAsignados %}
+                    <tr id="productoAgregado_{{p.id}}">
+                        <td>{{p.titulo}}</td>
+                        <td data-precioTxt='precio_txt_{{p.id}}'>${{p.precio|number_format(2, ',', '.')}}</td>
+                        <td>{{p.stockActual ~ p.unidad}}</td>
+                        <td>
+                            <input 
+                                type="number" 
+                                placeholder="Cant." 
+                                data-precio="{{p.precioUnitario}}" 
+                                data-idproducto="{{p.id}}" 
+                                data-cantidadanterior="{{p.cantidad}}" 
+                                data-reglasPrecios="{{p.reglas}}" 
+                                data-tipocampo="productoAsignado" 
+                                name="productoAsignado[{{p.id}}]" 
+                                value="{{p.cantidad}}"
+                                onchange="calcularTotales();"
+                            />
+                        </td>
+                        <td>
+                            <input type='checkbox' name="productoReservadoStock[{{p.id}}]" value="{{p.id}}" {{ (p.reservado == 1) ? 'checked="checked"':'' }} />
+                        </td>
+                        <td id="precioProducto_{{p.id}}">
+                            ${{(p.precio * p.cantidad)|number_format(0, ',', '.')}}
+                        </td>
+                        <td class="actions">
+                            <img src="/images/iconos/cancelar.svg" alt="Sacar producto" title="Sacar producto" onclick="sacarProductoCotizacion(this);" />
+                        </td>
+                    </tr>
+                {% endfor %}                
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan=5>TOTAL:</td>
+                    <td colspan=2 id='productosPrecioTotal'>${{(precioTotal ?? 0)|number_format(0, ',', '.')}}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<input type="hidden" name="_token" value="{{ (edicion) ? csrf_token('editar_cotizacion_'~cotizacion.id) : csrf_token('nueva_cotizacion') }}">
+<div class="botonesFormularios">
+    <a href="{{ path('cotizaciones_index') }}" class='btn btnCancelar'>Cancelar</a>
+    <button class="btn btnGuardar" name='guardar' value='1'>Guardar</button>
+</div>
+
+<script>
+    setDateFormatArgentina = function(el){
+        let val = el.value.split('-');
+        if(val.length > 1){
+            fechaFormateada = val[2]+'/'+val[1]+'/'+val[0];
+            el.setAttribute('data-formateado', fechaFormateada);
+        }
+    }
+    document.querySelectorAll('input[type=date]').forEach(setDateFormatArgentina);
+
+    function agregarProductoACotizacion(){
+        let idProducto = document.getElementById('hiddenProductoId').value;
+        let idAlmacen = document.querySelector('[data-idBuscadorProductos="almacen"]').value;
+
+        let formData = new FormData();
+            formData.append("idProducto", idProducto);
+            formData.append("idAlmacen", idAlmacen);
+
+        fetch("{{ path('cotizaciones_productos') }}", {
+            method: 'post',
+            mode: 'cors',
+            credentials: 'same-origin',
+            body: formData
+        }).then(function(response){
+            return response.json();
+        }).then(function(json){
+            cargaProductoListado(json);
+            document.getElementById('buscador_productos').value = '';
+            document.getElementById('hiddenProductoId').value = '';
+        }).catch(function(error){
+            console.log('ERROR:', error);
+        })
+    }
+
+    function cargaProductoListado(json){
+        
+        if(document.getElementById('productoAgregado_'+json.id) === null){
+
+            let tr = document.createElement('tr');
+                tr.setAttribute('id', 'productoAgregado_'+json.id);
+            let td1 = document.createElement('td');
+                td1.innerHTML = json.titulo;
+            let td2 = document.createElement('td');
+                td2.setAttribute('data-precioTxt', 'precio_txt_'+json.id);
+                td2.innerHTML = '$' + json.precio;
+            let td3 = document.createElement('td');
+                td3.innerHTML = json.stock + json.um
+            let td4 = document.createElement('td');
+            let td4_input = document.createElement('input');
+                td4_input.setAttribute('type', "number");
+                td4_input.setAttribute('placeholder', "Cant.");
+                td4_input.setAttribute('data-idProducto', json.id);
+                td4_input.setAttribute('data-precio', json.precio);
+                td4_input.setAttribute('data-reglasPrecios', json.reglaprecios);
+                td4_input.setAttribute('data-cantidadAnterior', 0);
+                td4_input.setAttribute('data-tipoCampo', 'productoAsignado');
+                td4_input.setAttribute('name', 'productoAsignado['+json.id+']');
+                td4_input.onchange = function(){
+                    calcularTotales();
+                }
+            let td5 = document.createElement('td');
+                td5.setAttribute('id', 'precioProducto_'+json.id);
+                td5.innerHTML = '$0';
+            let td6 = document.createElement('td');
+            let td6_eliminar = document.createElement('img');
+                td6_eliminar.setAttribute('src', "{{asset('images/iconos/cancelar.svg')}}");
+                td6_eliminar.setAttribute('alt', "Sacar producto");
+                td6_eliminar.setAttribute('title', "Sacar producto");
+                td6_eliminar.onclick = function(){
+                    sacarProductoCotizacion(this);
+                };
+            let td7 = document.createElement('td');
+            let td7_input = document.createElement('input');
+                td7_input.setAttribute('type', "checkbox");
+                td7_input.setAttribute('name', 'productoReservadoStock['+json.id+']');
+                td7_input.value = json.id;
+                td7_input.onchange = function(){
+                    revisarDisponibilidadStockReserva();
+                }
+
+            tr.append(td1);
+            tr.append(td2);
+            tr.append(td3);
+            td4.append(td4_input);
+            tr.append(td4);
+            td7.append(td7_input);
+            tr.append(td7);
+            tr.append(td5);
+            td6.append(td6_eliminar);
+            tr.append(td6);
+            document.getElementById('productosAsignadosCotizacion').prepend(tr);
+        }
+    }
+
+    function calcularTotales(){
+        let precioTotal = 0;
+        document.querySelectorAll('[data-tipocampo="productoAsignado"]').forEach(function(item, index){
+            let precioItem = item.dataset.precio;
+            let cantidad = item.value;
+            let id = item.dataset.idproducto;
+
+            // REVISO LAS REGLAS PARA CADA PRDUCTO
+            let reglasPrecios = item.dataset.reglasprecios;
+            reglasPrecios.split('|').forEach(function(item, index){
+                if(item != ''){
+                    let regla = item.split('-');
+                    if(cantidad >= parseInt(regla[0])){
+                        precioItem = regla[1];
+                    }
+                }
+            });
+            document.querySelectorAll('[data-preciotxt="precio_txt_'+id+'"]')[0].innerHTML = '$'+precioItem;
+
+            let precioTotalItem = precioItem * item.value;
+            precioTotal += precioTotalItem;
+            precioTotalItem = new Intl.NumberFormat("de-DE").format(precioTotalItem);
+            document.getElementById('precioProducto_'+id).innerHTML = "$"+precioTotalItem;
+        });
+        precioTotal = new Intl.NumberFormat("de-DE").format(precioTotal);
+        document.getElementById('productosPrecioTotal').innerHTML = "$"+precioTotal;
+    }
+
+    function sacarProductoCotizacion(self){
+        self.parentElement.parentElement.remove();
+        calcularTotales();
+    }
+
+    function revisarDisponibilidadStockReserva(){
+        return true;
+    }
+
+    // Clientes 
+    document.getElementById('hiddenClienteId').addEventListener('change',function(self){
+        document.getElementById('datosCliente').style.display = 'none';
+        let ID = this.value;
+        if(ID > 0){
+            let formData = new FormData();
+            formData.append("ID", ID);
+
+            fetch("{{ path('clientes_buscar_id') }}", {
+                method: 'post',
+                mode: 'cors',
+                credentials: 'same-origin',
+                body: formData
+            }).then(function(response){
+                return response.json();
+            }).then(function(json){
+                muestraDatosCliente(json);
+            }).catch(function(error){
+                console.log('ERROR:', error);
+            })
+        }
+    });
+
+    function muestraDatosCliente(cliente){
+        if(typeof cliente !== 'undefined'){
+            if(typeof cliente.mensaje === 'undefined'){
+                document.getElementById('datosCliente').style.display = 'table';
+                document.getElementById('cliente_rs').innerHTML = cliente.razonSocial;
+                document.getElementById('cliente_nya').innerHTML = cliente.nombre + ' ' + cliente.apellido;
+                document.getElementById('cliente_dni').innerHTML = cliente.dni;
+                document.getElementById('cliente_dir').innerHTML = cliente.direccion;
+                document.getElementById('cliente_tel').innerHTML = cliente.telefono;
+                document.getElementById('cliente_mail').innerHTML = cliente.mail;
+            }
+        }
+    }
+</script>
+
+<style>
+    #datosCliente th{
+        text-align: left;
+    }
+    #datosCliente tr:hover th,
+    #datosCliente tr:hover td{
+        background: var(--naranjaop);
+    }
+</style>

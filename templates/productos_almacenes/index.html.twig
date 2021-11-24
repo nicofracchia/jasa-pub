@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ProductosAlmacenes index{% endblock %}
+
+{% block body %}
+    <h1>ProductosAlmacenes index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for productos_almacene in productos_almacenes %}
+            <tr>
+                <td>{{ productos_almacene.id }}</td>
+                <td>
+                    <a href="{{ path('productos_almacenes_show', {'id': productos_almacene.id}) }}">show</a>
+                    <a href="{{ path('productos_almacenes_edit', {'id': productos_almacene.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="2">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('productos_almacenes_new') }}">Create new</a>
+{% endblock %}

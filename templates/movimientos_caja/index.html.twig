@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}MovimientosCaja index{% endblock %}
+
+{% block body %}
+    <h1>MovimientosCaja index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Fecha</th>
+                <th>Movimiento</th>
+                <th>TipoMovimiento</th>
+                <th>Monto</th>
+                <th>Observaciones</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for movimientos_caja in movimientos_cajas %}
+            <tr>
+                <td>{{ movimientos_caja.id }}</td>
+                <td>{{ movimientos_caja.fecha ? movimientos_caja.fecha|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ movimientos_caja.movimiento }}</td>
+                <td>{{ movimientos_caja.tipoMovimiento ? 'Yes' : 'No' }}</td>
+                <td>{{ movimientos_caja.monto }}</td>
+                <td>{{ movimientos_caja.observaciones }}</td>
+                <td>
+                    <a href="{{ path('movimientos_caja_show', {'id': movimientos_caja.id}) }}">show</a>
+                    <a href="{{ path('movimientos_caja_edit', {'id': movimientos_caja.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('movimientos_caja_new') }}">Create new</a>
+{% endblock %}

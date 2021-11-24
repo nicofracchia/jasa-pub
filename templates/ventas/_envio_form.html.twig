@@ -1,0 +1,32 @@
+{% set estadoSel = venta.estado ?? '' %}
+<div>
+    <div>
+        <label for="envio_estado">Estado</label>
+        <select id="envio_estado" name="envio[estado]">
+            <option {{ (estadoSel == "Preventa") ? 'selected' : '' }}>Preventa</option>
+            <option {{ (estadoSel == "Embalado") ? 'selected' : '' }}>Embalado</option>
+            <option {{ (estadoSel == "Esperando transporte") ? 'selected' : '' }}>Esperando transporte</option>
+            <option {{ (estadoSel == "En tránsito") ? 'selected' : '' }}>En tránsito</option>
+            <option {{ (estadoSel == "Finalizada") ? 'selected' : '' }}>Finalizada</option>
+        </select>
+    </div>
+    <div></div>
+    <div></div>
+    <div>
+        <label for="envio_costo">Costo de envío</label>
+        <input type="number" id="envio_costo" name="envio[costo]" value="{{ envio.costoEnvio ?? '' }}" placeholder="$" step=".01">
+    </div>
+    <div>
+        <label for="envio_embalaje">Costo de embalaje</label>
+        <input type="number" id="envio_embalaje" name="envio[embalaje]" value="{{ envio.costoEmbalaje ?? '' }}" placeholder="$" step=".01">
+    </div>
+    <div>
+        <label for="envio_seguimiento">N° de guía</label>
+        <input type="text" id="envio_seguimiento" name="envio[seguimiento]" value="{{ envio.codigoSeguimiento ?? '' }}" placeholder="N° de guía">
+    </div>
+</div>
+<input type="hidden" name="_token" value="{{ csrf_token('editar_envio') }}">
+<div class="botonesFormularios">
+    <a href="{{ path('ventas_index') }}" class='btn btnCancelar'>Cancelar</a>
+    <button class="btn btnGuardar" name='guardar' value='1'>Guardar</button>
+</div>

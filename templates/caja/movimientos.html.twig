@@ -1,0 +1,82 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Caja diaria{% endblock %}
+
+{% block rutas %}Caja diaria - <span>Movimientos</span>{% endblock %}
+
+{% block contenido %}
+    <h1>Nuevo movimiento</h1>
+
+    <div>
+        <label for="caja_saldo" class="required">Saldo estimado: ${{montoEstimado|number_format(2, ',', '.')}}</label>
+    </div>
+    <div></div><div></div>
+
+    <form method="post" action="{{ path('caja_movimiento', {'id': caja.id}) }}">
+        <div>
+            <div>
+                <label for="caja_movimiento" class="required">
+                    Movimiento
+                    <img src="{{asset('images/iconos/nuevo.svg')}}" class='btnNuevoModal' alt="Nuevo movimiento" title="Nuevo movimiento" onclick="oGen.fnCargaModal('{{path('movimientos_modal')}}')" />
+                </label>
+                <select name="movimiento[movimiento]" id="caja_movimiento">
+                    {% for m in movimientosTipo %}
+                        <option value='{{m.id}}'>
+                            {{m.movimiento}}
+                            {{(m.tipo == 1) ? ' (+)' : ' (-)'}}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="caja_monto" class="required">Monto</label>
+                <input type="number" id="caja_monto" name="movimiento[monto]" required="required" placeholder="$" step=".01" />
+            </div>
+            <div>
+                <label for="caja_observaciones">Observaciones</label>
+                <textarea name="movimiento[observaciones]" id="caja_observaciones" placeholder="Observaciones"></textarea>
+            </div>
+            <div class="botonesFormularios">
+                <button class="btn btnGuardar" name='guardar' value='1'>Guardar</button>
+            </div>
+            <div class="botonesFormularios">
+                <a href='{{ path('caja_cerrar', {'id': caja.id}) }}'><button class="btn btnEliminar" type="button">Cerrar caja</button></a>
+            </div>
+            <input type="hidden" name="_token" value="{{ csrf_token('nuevo_movimiento') }}"></div>
+            
+            <div class='separador'></div>
+
+            <table class='tablaProductosAsignados'>
+                <thead>
+                    <tr>
+                        <th>Hora</th>
+                        <th>Movimiento</th>
+                        <th>Monto</th>
+                        <th>Observaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mov in movimientos %}
+                        <tr>
+                            <td>{{mov.hora}}</td>
+                            <td>{{mov.movimiento}}</td>
+                            <td style="color:{{(mov.tipo == 1) ? 'green':'red'}}">
+                                ${{mov.monto|number_format(2, ',', '.')}}
+                            </td>
+                            <td>{{mov.observaciones}}</td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td>{{caja.inicio|slice(10, 10)}}</td>
+                        <td>Saldo inicial</td>
+                        <td>${{caja.saldo_inicial|number_format(2, ',', '.')}}</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </form>
+    
+
+{% endblock %}

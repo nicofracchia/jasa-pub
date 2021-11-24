@@ -1,0 +1,25 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Combos{% endblock %}
+
+{% block rutas %}Combos > <span>Editar combo</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('combos_edit', {'id': combo.id}) }}" class="actual">Detalles del combo</a>
+    <a href="{{ path('combos_imagenes', {'id': combo.id}) }}">Imágenes</a>
+    <a href="{{ path('combos_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Detalles del combo</h1>
+
+    {% for ms in mensajeStock %}
+            {{ms|raw}}
+    {% endfor %}
+
+    {{ include('combos/_form.html.twig') }}
+
+    {{ include('combos/_delete_form.html.twig') }}
+{% endblock %}

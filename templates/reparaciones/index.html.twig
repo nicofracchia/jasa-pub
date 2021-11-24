@@ -1,0 +1,56 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Reparaciones{% endblock %}
+
+{% block rutas %}<span>Reparaciones</span>{% endblock %}
+
+{% block contenido %}
+    <div class='filtros'>
+        <a href="{{ path('reparaciones_new') }}"><img src="{{asset('images/iconos/nuevo.png')}}" alt="" /></a>
+    </div>
+
+    <h1>Reparaciones</h1>
+
+    <table class="tablaListados">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Recepcion</th>
+                <th>Cliente</th>
+                <th>Articulo</th>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Serial</th>
+                <th>Tarea</th>
+                <th>Estado</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for reparacione in reparaciones %}
+            <tr>
+                <td>{{ reparacione.id }}</td>
+                <td>{{ reparacione.recepcion ? reparacione.recepcion|date('d/m/Y H:i:s') : '' }}</td>
+                <td>{{ (reparacione.cliente) ? reparacione.cliente.apellido ~ ', ' ~ reparacione.cliente.nombre : 'Anónimo'}}</td>
+                <td>{{ reparacione.articulo }}</td>
+                <td>{{ reparacione.marca }}</td>
+                <td>{{ reparacione.modelo }}</td>
+                <td>{{ reparacione.serial }}</td>
+                <td>{{ reparacione.tarea }}</td>
+                <td>{{ reparacione.estado }}</td>
+                <td style='text-align:right'>
+                    <a href="{{ path('reparaciones_ingreso', {'id': reparacione.id}) }}" title='Modificar ingreso'><img src="{{asset('images/iconos/ingreso.svg')}}" alt="" /></a>
+                    <a href="{{ path('reparaciones_mesa', {'id': reparacione.id}) }}" title='Mesa de trabajo'><img src="{{asset('images/iconos/mesa_trabajo.svg')}}" alt="" /></a>
+                    <a href="{{ path('reparaciones_imagenes', {'id': reparacione.id}) }}" title='Imagenes'><img src="{{asset('images/iconos/imagenes.svg')}}" alt="" /></a>
+                    <a href="{{ path('reparaciones_pagos', {'id': reparacione.id}) }}" title='Pagos'><img src="{{asset('images/iconos/editar-pagos_off.png')}}" alt="" /></a>
+                    <a href="{{ path('reparaciones_detalle', {'id': reparacione.id}) }}" title='Orden de reparación'><img src="{{asset('images/iconos/ver.png')}}" alt="" /></a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="20">No hay reparaciones pendientes.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="shortcut icon" type="images/png" href="{{asset('images/logo.png')}}">
+        <title>JASA SUBLIMACIONES{% block title %}{% endblock %}</title>
+        <link type="text/css" rel="stylesheet" href="{{asset('css/estilos.css')}}">
+        <script src="{{asset('js/oGenerales.js')}}"></script>
+        <script id="oClientes" data-clientesBuscar="{{ path('clientes_buscar') }}" data-clientesModal="{{ path('clientes_modal') }}" src="{{asset('js/oClientes.js')}}"></script>
+        <script id="oReparaciones" data-marcasModal="{{ path('marcas_modal') }}" data-modelosModal="{{ path('modelos_modal') }}" data-tareasModal="{{ path('tareas_modal') }}" src="{{asset('js/oReparaciones.js')}}"></script>
+        <script id="oCaja" data-movimientosModal="{{ path('movimientos_modal') }}" src="{{asset('js/oCaja.js')}}"></script>
+        <script id="oMotivosAjustesStock" data-motivosAjustesStockModal="{{ path('motivos_ajustes_stock_modal') }}" src="{{asset('js/oMotivosAjustesStock.js')}}"></script>
+    </head>
+    <body>
+        <header>
+            <div class="logo"><img src="{{asset('images/logo.png')}}" alt="" /></div>
+            {% if app.user %}
+                <div class="saludo">Bienvenido/a {{ app.user.nombre }} {{ app.user.apellido }}</div>
+                <div class="logOut"><a href="{{ path('app_logout') }}">Cerrar sesión</a></div>
+            {% endif %}
+        </header>
+        {% if app.user %}
+            <div id="rutas">{% block rutas %}<span>Home</span>{% endblock %}</div>
+            <div id="pestanias">{% block pestanias %}{% endblock %}</div>
+            <section>
+                <nav>
+                    <a href='{{ path('categorias_index') }}'>
+                        <img src='{{ asset('images/iconos/menu/categorias.svg')}}' alt='Categorías' />
+                        CATEGORÍAS
+                    </a>
+                    <a href='{{ path('reparaciones_index') }}'>
+                        <img src='{{ asset('images/iconos/menu/reparaciones_off.png')}}' alt='Productos' />
+                        REPARACIONES
+                    </a>
+                    <a href='{{ path('productos_index') }}'>
+                        <img src='{{ asset('images/iconos/menu/productos_off.png')}}' alt='Productos' />
+                        PRODUCTOS
+                    </a>
+                    <a href='{{ path('combos_index') }}'>
+                        <img src='{{ asset('images/iconos/menu/ofertas-combos_off.png')}}' alt='Combos' />
+                        COMBOS
+                    </a>
+                    <a href={{ path('almacenes_index') }}>
+                        <img src='{{ asset('images/iconos/menu/almacenes_off.png')}}' alt='Almacenes' />
+                        ALMACENES
+                    </a>
+                    <a href={{ path('proveedores_index') }}>
+                        <img src='{{ asset('images/iconos/menu/proveedores_off.png')}}' alt='Proveedores' />
+                        PROVEEDORES
+                    </a>
+                    <a href={{ path('clientes_index') }}>
+                        <img src='{{ asset('images/iconos/menu/clientes_off.png')}}' alt='Clientes' />
+                        CLIENTES
+                    </a>
+                    <a href={{ path('cotizaciones_index') }}>
+                        <img src='{{ asset('images/iconos/menu/cotizador_off.png')}}' alt='Cotizaciones' />
+                        COTIZADOR
+                    </a>
+                    <a href={{ path('ventas_index') }}>
+                        <img src='{{ asset('images/iconos/menu/ventas_off.png')}}' alt='Ventas' />
+                        VENTAS
+                    </a>
+                    <a href={{ path('compras_index') }}>
+                        <img src='{{ asset('images/iconos/menu/ordenes-compra_off.png')}}' alt='Ventas' />
+                        ORDENES DE COMPRA
+                    </a>
+                    <a href={{ path('movimientos_almacenes_index') }}>
+                        <img src='{{ asset('images/iconos/menu/movimientos_almacenes.svg')}}' alt='Movimientos entre almacenes' />
+                        MOVMIENTOS ENTRE ALMCENES
+                    </a>
+                    <a href={{ path('alertas') }}>
+                        <img src='{{ asset('images/iconos/menu/alertas_off.png')}}' alt='Ventas' />
+                        ALERTAS
+                    </a>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href={{ path('usuarios_index') }}>
+                            <img src='{{ asset('images/iconos/menu/usuarios_off.png')}}' alt='Usuarios' />
+                            USUARIOS
+                        </a>
+                        <a href={{ path('caja_index') }}>
+                            <img src='{{ asset('images/iconos/menu/caja.svg')}}' alt='Caja' />
+                            CAJA DIARIA
+                        </a>
+                        <a href={{ path('reportes_index') }}>
+                            <img src='{{ asset('images/iconos/menu/reportes_off.png')}}' alt='Reportes' />
+                            REPORTES
+                        </a>
+                    {% endif %}
+                </nav>
+                <div id="container">
+                    {% block contenido %}Bienvenido al sistema de JASA Sublimaciones{% endblock %}
+                </div>
+            </section>
+            <div id="paginado">{% block paginado %}{% endblock %}</div>
+        {% else %}
+            {% block loginFrm %}{% endblock %}
+        {% endif %}
+        <footer>
+            Jasa sublimación | &copy; Todos los derechos reservados - 2020
+        </footer>
+    </body>
+</html>

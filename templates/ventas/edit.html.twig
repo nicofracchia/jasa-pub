@@ -1,0 +1,23 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Ventas{% endblock %}
+
+{% block rutas %}Ventas > <span>Editar venta</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('ventas_edit', {'id': venta.id}) }}" class="actual">Detalles de la venta</a>
+    <a href="{{ path('ventas_imagenes', {'id': venta.id}) }}">Imágenes</a>
+    <a href="{{ path('ventas_envio', {'id': venta.id}) }}">Detalles de envío</a>
+    <a href="{{ path('ventas_pagos', {'id': venta.id}) }}">Pagos</a>
+    <a href="{{ path('ventas_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Editar venta</h1>
+
+    <form method="post" action="{{ path('ventas_edit', {'id' : venta.id}) }}" onkeydown="return event.key != 'Enter';" onsubmit="return validaFrmVentas();">
+        {{ include('ventas/_form.html.twig') }}
+    </form>
+{% endblock %}

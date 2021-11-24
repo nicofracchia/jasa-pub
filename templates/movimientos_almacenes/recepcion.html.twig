@@ -1,0 +1,96 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Movimientos entre almacenes{% endblock %}
+
+{% block rutas %}Movimientos entre almacenes > <span>Confirmar recepción</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('movimientos_almacenes_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Confirmar recepción del pedido</h1>
+
+    <form method="post" action="{{ path('movimientos_almacenes_recepcion', {'id': pedido.id}) }}">
+
+        <div>
+            <div>
+                <label>Productos solicitados por {{pedido.desde.nombre}}</label>
+                <table class="tablaProductosAsignados">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody id='productosAsignadosPedido'>
+                        {% for p in productosAsignadosPedido %}
+                            <tr>
+                                <td>{{p.titulo}}</td>
+                                <td>{{p.cantidad}} {{p.unidad}}</td>
+                            </tr>
+                        {% endfor %}                
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <label>Productos enviados por {{pedido.hacia.nombre}}</label>
+                <table class="tablaProductosAsignados">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody id='productosAsignadosEnvio'>
+                        {% for p in productosAsignadosEnvio %}
+                            <tr>
+                                <td>{{p.titulo}}</td>
+                                <td>{{p.cantidad}} {{p.unidad}}</td>
+                            </tr>
+                        {% endfor %}                
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <label>Productos recibidos</label>
+                <table class="tablaProductosAsignados">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody id='productosAsignadosRecepcion'>
+                        {% for p in productosAsignadosPedido %}
+                            <tr id="productoAgregado_{{p.id}}">
+                                <td>{{p.titulo}}</td>
+                                <td>
+                                    <input 
+                                        type="number" 
+                                        placeholder="Cant." 
+                                        data-idproducto="{{p.id}}" 
+                                        data-cantidadanterior="{{p.cantidad}}" 
+                                        data-tipocampo="productoAsignado" 
+                                        name="productoAsignado[{{p.id}}]" 
+                                        value="{{p.cantidad}}"
+                                    />
+                                    {{p.unidad}}
+                                </td>
+                            </tr>
+                        {% endfor %}                
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <input type="hidden" name="_token" value="{{ csrf_token('confirmar_pedido_'~pedido.id) }}">
+        <div class="botonesFormularios">
+            <a href="{{ path('movimientos_almacenes_index') }}" class='btn btnCancelar'>Cancelar</a>
+            <button class="btn btnGuardar" name='guardar' value='1'>Confirmar recepción</button>
+            <br/><br/>
+        </div>
+    </form>
+
+{% endblock %}

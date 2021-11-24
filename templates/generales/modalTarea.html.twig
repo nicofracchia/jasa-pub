@@ -1,0 +1,17 @@
+<div class='baseModal'>
+    <div class='contenidoModal'>
+        <input type="hidden" name="modalTarea_token" id="modalTarea_token" value="{{ csrf_token('nueva_tarea') }}">
+        <div class='cerrarModal' onclick="oGen.fnCerrarModal(this);">
+            <img src="{{asset('images/iconos/cancelar.svg')}}" alt='Cerrar' title='Cerrar' />
+        </div>
+        <h1>Nueva tarea</h1>
+        <div>
+            <label for="modalTarea_tarea">Tarea</label>
+            <input type="text" id="modalTarea_tarea" name="modalTarea[tarea]">
+        </div>
+        <div>
+            <label><br/></label>
+            <button class="btn btnGuardar" onclick="oRep.fnGuardaTareaModal()">Guardar</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,8 @@
+<input type="text" id="buscador_clientes" placeholder="Ej: Juan Perez" onkeyup="oCli.buscaClientes(this);" value="{{busClienteSelTxt ?? ''}}" autocomplete="off" />
+<div class='modalResultadosBuscador' id='modalClientes'>
+    <div class='topModal'>
+        <img src="{{asset('images/iconos/cancelar.svg')}}" alt="Cerrar" title="Cerrar" onclick="oCli.ocultarBuscadorClientes();"/>
+    </div>
+    <table id='resultadosClientes'></table>
+</div>
+<input type='hidden' id='hiddenClienteId' name='{{nombreCampoCliente}}' value='{{busClienteSel ?? ''}}' />

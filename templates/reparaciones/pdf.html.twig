@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Órden de reparación N° {{reparacion.id}} - JASA SUBLIMACIONES</title>
+        <style>
+            .encabezado .logo{
+                font-family:Helvetica;
+                font-size:30px;
+                font-weight:bold;
+                background:#fe9629;
+                padding:20px;
+                color:#FFF;
+            }
+            .encabezado .titulo{
+                font-size:15px;
+                font-family:sans-serif;
+                font-weight:bold;
+                vertical-align:bottom;
+                text-align:right;
+            }
+            .detalles{
+                width:470px;
+                font-family:sans-serif;
+                border:solid 1px #000;
+                padding:15px;
+            }
+            .detalles th,
+            .detalles td{
+                text-align:left;
+                padding-top:10px;
+                vertical-align:top;
+                font-size:10px;
+            }
+            .detalles .txtInfo{
+                border-top:solid 1px #fe9629;
+                font-size:8px;
+            }
+            .detalles .txtInfoBkg{
+                font-size:8px;
+                background:#fe9629;
+                padding:5px;
+                text-align:center;
+                border:solid 1px #fe9629;
+                color:#FFF;
+            }
+            .detalles .bordeNaranja{
+                padding:0;
+                border:solid 1px #fe9629;
+                text-align:center;
+                vertical-align:middle;
+            }
+        </style>
+    </head>
+    <body>
+        <table class='encabezado'>
+            <tr>
+                <td>
+                    <img src="http://cms.jasasublimacion.com.ar/images/logo.png" />
+                </td>
+                <td class='titulo'>
+                    Órden de reparación
+                </td>
+            </tr>
+        </table>
+        <table class='detalles'>
+            <tr>
+                <th>N° de orden:</th>
+                <td>LDZ-{{reparacion.id}}</td>
+                <th>Fecha:</th>
+                <td>{{ reparacion.recepcion ? reparacion.recepcion|date('d/m/Y H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Recepción:</th>
+                <td>{{ reparacion.receptor.nombre ?? ''}} {{ reparacion.receptor.apellido ?? ''}}</td>
+                <th>Cliente:</th>
+                <td>{{ reparacion.cliente.nombre ?? ''}} {{ reparacion.cliente.apellido ?? ''}}</td>
+            </tr>
+            <tr>
+                <th>Teléfono:</th>
+                <td>{{ reparacion.cliente.telefono ?? ''}}</td>
+                <th>Mail:</th>
+                <td>{{ reparacion.cliente.mail ?? ''}}</td>
+            </tr>
+            <tr>
+                <th>Dirección:</th>
+                <td colspan=3>{{ reparacion.cliente.direccion ?? ''}}</td>
+            </tr>
+            <tr>
+                <th>Artículo:</th>
+                <td>{{ reparacion.articulo ?? ''}}</td>
+                <th>Tarea:</th>
+                <td colspan=3>{{ reparacion.tarea ?? ''}}</td>
+            </tr>
+            <tr>
+                <th>Marca:</th>
+                <td>{{ reparacion.marca ?? ''}}</td>
+                <th>Modelo:</th>
+                <td>{{ reparacion.modelo ?? ''}}</td>
+            </tr>
+            <tr>
+                <th>N° de serie:</th>
+                <td>{{ reparacion.serial ?? ''}}</td>
+                <th>Tintas:</th>
+                <td>
+                    <b>C:</b> %{{reparacion.tintaC ?? '0'}}&nbsp;&nbsp;&nbsp;
+                    <b>CL:</b> %{{reparacion.tintaCl ?? '0'}}
+                    <br/>
+                    <b>M:</b> %{{reparacion.tintaM ?? '0'}}&nbsp;&nbsp;&nbsp;
+                    <b>ML:</b> %{{reparacion.tintaMl ?? '0'}}
+                    <br/>
+                    <b>Y:</b> %{{reparacion.tintaY ?? '0'}}&nbsp;&nbsp;&nbsp;
+                    <b>BK:</b> %{{reparacion.tintaBk ?? '0'}}
+                </td>
+            </tr>
+            <tr>
+                <th>Reporte:</th>
+                <td colspan=3>{{ reparacion.reporte ?? ''}}</td>
+            </tr>
+            {% if reparacion.diagnostico != '' %}
+                <tr>
+                    <th>Diagnóstico:</th>
+                    <td colspan=3>{{ reparacion.diagnostico ?? ''}}</td>
+                </tr>
+            {% if reparacion.observaciones != '' %}
+            {% endif %}
+                <tr>
+                    <th>Observaciones:</th>
+                    <td colspan=3>{{ reparacion.observaciones ?? ''}}</td>
+                </tr>
+            {% endif %}
+            <tr><td colspan=4><br/></td></tr>
+            <tr>
+                <td colspan=4 class='txtInfo'>
+                    <br/><br/>
+                    PARA CONOCER EL ESTADO DEL EQUIPO CONSULTAR A: <b>tecnica@sistemacontinuojasa.com</b>
+                    <br/><br/>
+                    El equipo en reparación solo será entregado presentando esta orden de servicio o con el DNI del titular. 
+                    En caso de retirar el equipo sin reparar, el costo de revisión será de <b>${{reparacion.sena|number_format(2, ',', '.')}}</b>
+                    <br/><br/>
+                    Si el equipo a reparar no fuera retirado durante los 90 días posteriores al aviso efectuado por la empresa, el mismo pasará al depósito del taller. 
+                    Pasados los sesenta días más, La misma será considerada como cosa abandonada EN LOS TÉRMINOS DEL ARTÍCULO 1947 ccyc y la empresa disponer de ella como si fuera propia. 
+                    (Conf, Cláusula octava del contrato de reparación) perdiendo el cliente todo derecho a reclamos o indemnización alguna
+                    <br/><br/>
+                </td>
+            </tr>
+            <tr>
+                <td colspan=3 rowspan=2 class='txtInfoBkg'>
+                    <b>LOMAS DE ZAMORA:</b> Lunes a Viernes de 09hs a 18hs, Sábados de 09hs a 13hs. Mariano Boedo 711 (011) 4245-1059
+                    <br/><br/>
+                    <b>VILLA CARLOS PAZ:</b> Lunes a Viernes de 09:30hs a 13hs - 14hs a 19hs, Sábados de 09:30hs a 13hs. 
+                    Av. San Martín 1823 (03541) 433665 / (03541) 436640
+                    <br/><br/>
+                    <b>0800-220-5272 | www.jasasublimacion.com.ar</b>
+                </td>
+                <td class='bordeNaranja'>
+                    ${{reparacion.sena}}
+                    <br/>
+                    <b>SEÑA</b>
+                </td>
+            </tr>
+            <tr>
+                <td class='bordeNaranja'>
+                    ${{reparacion.presupuestoFinal ? reparacion.presupuestoFinal|number_format(2, ',', '.') : reparacion.presupuestoInicial|number_format(2, ',', '.')}}
+                    <br/>
+                    <b>IMPORTE</b>
+                </td>
+            </tr>
+        </table>   
+
+
+        {# *-*-*-*-*-*-*-* DUPLICADO *-*-*-*-*-*-*-* #}
+
+
+        <table class='encabezado'>
+            <tr>
+                <td>
+                    <img src="http://cms.jasasublimacion.com.ar/images/logo.png" />
+                </td>
+                <td class='titulo'>
+                    Órden de reparación
+                </td>
+            </tr>
+        </table>
+        <table class='detalles'>
+            <tr>
+                <th>N° de orden:</th>
+                <td>LDZ-{{reparacion.id}}</td>
+                <th>Fecha:</th>
+                <td>{{ reparacion.recepcion ? reparacion.recepcion|date('d/m/Y H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Recepción:</th>
+                <td>{{ reparacion.receptor.nombre ?? ''}} {{ reparacion.receptor.apellido ?? ''}}</td>
+                <th>Cliente:</th>
+                <td>{{ reparacion.cliente.nombre ?? ''}} {{ reparacion.cliente.apellido ?? ''}}</td>
+            </tr>
+            <tr>
+                <th>Teléfono:</th>
+                <td>{{ reparacion.cliente.telefono ?? ''}}</td>
+                <th>Mail:</th>
+                <td>{{ reparacion.cliente.mail ?? ''}}</td>
+            </tr>
+            <tr>
+                <th>Dirección:</th>
+                <td colspan=3>{{ reparacion.cliente.direccion ?? ''}}</td>
+            </tr>
+            <tr>
+                <th>Artículo:</th>
+                <td>{{ reparacion.articulo ?? ''}}</td>
+                <th>Tarea:</th>
+                <td colspan=3>{{ reparacion.tarea ?? ''}}</td>
+            </tr>
+            <tr>
+                <th>Marca:</th>
+                <td>{{ reparacion.marca ?? ''}}</td>
+                <th>Modelo:</th>
+                <td>{{ reparacion.modelo ?? ''}}</td>
+            </tr>
+            <tr>
+                <th>N° de serie:</th>
+                <td>{{ reparacion.serial ?? ''}}</td>
+                <th>Tintas:</th>
+                <td>
+                    <b>C:</b> %{{reparacion.tintaC ?? '0'}}&nbsp;&nbsp;&nbsp;
+                    <b>CL:</b> %{{reparacion.tintaCl ?? '0'}}
+                    <br/>
+                    <b>M:</b> %{{reparacion.tintaM ?? '0'}}&nbsp;&nbsp;&nbsp;
+                    <b>ML:</b> %{{reparacion.tintaMl ?? '0'}}
+                    <br/>
+                    <b>Y:</b> %{{reparacion.tintaY ?? '0'}}&nbsp;&nbsp;&nbsp;
+                    <b>BK:</b> %{{reparacion.tintaBk ?? '0'}}
+                </td>
+            </tr>
+            <tr>
+                <th>Reporte:</th>
+                <td colspan=3>{{ reparacion.reporte ?? ''}}</td>
+            </tr>
+            {% if reparacion.diagnostico != '' %}
+                <tr>
+                    <th>Diagnóstico:</th>
+                    <td colspan=3>{{ reparacion.diagnostico ?? ''}}</td>
+                </tr>
+            {% if reparacion.observaciones != '' %}
+            {% endif %}
+                <tr>
+                    <th>Observaciones:</th>
+                    <td colspan=3>{{ reparacion.observaciones ?? ''}}</td>
+                </tr>
+            {% endif %}
+            <tr><td colspan=4><br/></td></tr>
+            <tr>
+                <td colspan=4 class='txtInfo'>
+                    <br/><br/>
+                    PARA CONOCER EL ESTADO DEL EQUIPO CONSULTAR A: <b>tecnica@sistemacontinuojasa.com</b>
+                    <br/><br/>
+                    El equipo en reparación solo será entregado presentando esta orden de servicio o con el DNI del titular. 
+                    En caso de retirar el equipo sin reparar, el costo de revisión será de <b>${{reparacion.sena|number_format(2, ',', '.')}}</b>
+                    <br/><br/>
+                    Si el equipo a reparar no fuera retirado durante los 90 días posteriores al aviso efectuado por la empresa, el mismo pasará al depósito del taller. 
+                    Pasados los sesenta días más, La misma será considerada como cosa abandonada EN LOS TÉRMINOS DEL ARTÍCULO 1947 ccyc y la empresa disponer de ella como si fuera propia. 
+                    (Conf, Cláusula octava del contrato de reparación) perdiendo el cliente todo derecho a reclamos o indemnización alguna
+                    <br/><br/>
+                </td>
+            </tr>
+            <tr>
+                <td colspan=3 rowspan=2 class='txtInfoBkg'>
+                    <b>LOMAS DE ZAMORA:</b> Lunes a Viernes de 09hs a 18hs, Sábados de 09hs a 13hs. Mariano Boedo 711 (011) 4245-1059
+                    <br/><br/>
+                    <b>VILLA CARLOS PAZ:</b> Lunes a Viernes de 09:30hs a 13hs - 14hs a 19hs, Sábados de 09:30hs a 13hs. 
+                    Av. San Martín 1823 (03541) 433665 / (03541) 436640
+                    <br/><br/>
+                    <b>0800-220-5272 | www.jasasublimacion.com.ar</b>
+                </td>
+                <td class='bordeNaranja'>
+                    ${{reparacion.sena}}
+                    <br/>
+                    <b>SEÑA</b>
+                </td>
+            </tr>
+            <tr>
+                <td class='bordeNaranja'>
+                    ${{reparacion.presupuestoFinal ? reparacion.presupuestoFinal|number_format(2, ',', '.') : reparacion.presupuestoInicial|number_format(2, ',', '.')}}
+                    <br/>
+                    <b>IMPORTE</b>
+                </td>
+            </tr>
+        </table>   
+    </body>
+</html>

@@ -1,0 +1,251 @@
+{% set edicion = (combo is defined) ? true : false %}
+{% set almacenSel = combo.almacen.id ?? '' %}
+{% set habilitado = combo.habilitado ?? 0 %}
+
+<table>
+    <tr>
+        <td>Costo total:</td>
+        <td id='costoTotalGral'>$ 0</td>
+    </tr>
+    <tr>
+        <td>Precio total:</td>
+        <td id='precioTotalGral'>$ 0</td>
+    </tr>
+</table>
+
+<form method="post" action="{{ (edicion) ? path('combos_edit', {'id': combo.id}) : path('combos_new') }}">
+
+    <div>
+        <div>
+            <label for="combo_almacen" class="required">Almacen</label>
+            {% if app.user.almacen.id != 1 %}
+                <input type='hidden' id="combo_almacen" name="combo[almacen]" data-idBuscadorProductos="almacen" value='{{app.user.almacen.id}}' />
+                {{app.user.almacen.nombre}}
+            {% else %}
+                <select id="combo_almacen" name="combo[almacen]" required="required" data-idBuscadorProductos="almacen">
+                    <option value="">Seleccionar...</option>
+                    {% for almacen in almacenes %}
+                        <option value="{{almacen.id}}" {{ (almacenSel == almacen.id) ? 'selected' : '' }}>{{almacen.nombre}} - {{almacen.direccion}}</option>
+                    {% endfor %}
+                </select>
+            {% endif %}
+        </div>
+        <div></div><div></div>
+        <div>
+            <label for="combo_nombre" class="required">Título</label>
+            <input type="text" id="combo_nombre" name="combo[titulo]" required="required" value="{{combo.nombre ?? ''}}" placeholder="Título del combo" />
+        </div>
+        <input type="hidden" id="combo_porcentaje" name="combo[porcentaje_costo]" value="0"/>
+        <div>
+            <label for="combo_precio" class="required">Precio final</label>
+            <input type="number" step=".01" id="combo_precio" name="combo[precio_final]" value="{{combo.precioFinal ?? 0}}" placeholder='$'/>
+        </div>
+        <div>
+            <label for="combo_descripcion">Descripción</label>
+            <textarea id="combo_descripcion" name="combo[descripcion]">{{combo.descripcion ?? ''}}</textarea>
+        </div>
+        <div>
+            <label> </label>
+            <div class="contCheckBox">
+                <input type="checkbox" id="combo_habilitado" name="combo[habilitado]" value="1" {{ (habilitado == "1") ? "checked='checked'" : '' }}>
+                <label for="combo_habilitado">Habilitado</label>
+            </div>
+        </div>
+        <div></div>
+        <div></div>
+        <div>
+            <label>Productos</label>
+            {{ include('generales/busProductos.html.twig',{
+                'nombreCampoProducto' : '',
+                'busProductoSel' : '',
+                'busProductoSelTxt' : '',
+                'callbackCargar' : 'agregarProductoACombo();'
+            }) }}
+        </div>
+        <div style="width:60%;">
+            <label>Productos asignados</label>
+            <table class="tablaProductosAsignados">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Costo</th>
+                        <th>Precio</th>
+                        <th>Stock actual</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id='productosAsignadosVenta'>
+                    {% for p in productosAsignados %}
+                        <tr id="productoAgregado_{{p.id}}">
+                            <td>{{p.titulo}}</td>
+                            <td>${{p.costo|number_format(2, ',', '.')}}</td>
+                            <td data-precioTxt='precio_txt_{{p.id}}'>${{p.precio|number_format(2, ',', '.')}}</td>
+                            <td>{{p.stockActual ~ p.unidad}}</td>
+                            <td>
+                                <input 
+                                    type="number" 
+                                    placeholder="Cant." 
+                                    data-costo="{{p.costo}}" 
+                                    data-precio="{{p.precioUnitario}}" 
+                                    data-idproducto="{{p.id}}" 
+                                    data-cantidadanterior="{{p.cantidad}}" 
+                                    data-reglasPrecios="{{p.reglas}}" 
+                                    data-tipocampo="productoAsignado" 
+                                    name="productoAsignado[{{p.id}}]" 
+                                    value="{{p.cantidad}}"
+                                    onchange="calcularTotales();"
+                                />
+                            </td>
+                            <td id="precioProducto_{{p.id}}">
+                                ${{(p.precio * p.cantidad)|number_format(0, ',', '.')}}
+                            </td>
+                            <td class="actions">
+                                <img src="/images/iconos/cancelar.svg" alt="Sacar producto" title="Sacar producto" onclick="sacarProductoCombo(this);" />
+                            </td>
+                        </tr>
+                    {% endfor %}                
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan=5>TOTAL:</td>
+                        <td colspan=2 id='productosPrecioTotal'>${{(precioTotal ?? 0)|number_format(0, ',', '.')}}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <input type="hidden" name="_token" value="{{ (edicion) ? csrf_token('editar_combo_'~combo.id) : csrf_token('nuevo_combo') }}">
+    <div class="botonesFormularios">
+        <a href="{{ path('combos_index') }}" class='btn btnCancelar'>Cancelar</a>
+        <button class="btn btnGuardar" name='guardar' value='1'>Guardar</button>
+        <br/><br/>
+        <!--
+        <button class="btn btnGuardar" name='guardar' value='2'>Guardar y cargar imágenes</button>
+        -->
+    </div>
+</form>
+
+<script>
+    function agregarProductoACombo(){
+        let idProducto = document.getElementById('hiddenProductoId').value;
+        let idAlmacen = document.querySelector('[data-idBuscadorProductos="almacen"]').value;
+
+        let formData = new FormData();
+            formData.append("idProducto", idProducto);
+            formData.append("idAlmacen", idAlmacen);
+
+        fetch("{{ path('combos_productos') }}", {
+            method: 'post',
+            mode: 'cors',
+            credentials: 'same-origin',
+            body: formData
+        }).then(function(response){
+            return response.json();
+        }).then(function(json){
+            cargaProductoListado(json);
+            document.getElementById('buscador_productos').value = '';
+            document.getElementById('hiddenProductoId').value = '';
+        }).catch(function(error){
+            console.log('ERROR:', error);
+        })
+    }
+
+    function cargaProductoListado(json){
+        
+        if(document.getElementById('productoAgregado_'+json.id) === null){
+
+            let tr = document.createElement('tr');
+                tr.setAttribute('id', 'productoAgregado_'+json.id);
+            let td1 = document.createElement('td');
+                td1.innerHTML = json.titulo;
+            let td21 = document.createElement('td');
+                td21.innerHTML = '$' + json.costo;
+            let td2 = document.createElement('td');
+                td2.setAttribute('data-precioTxt', 'precio_txt_'+json.id);
+                td2.innerHTML = '$' + json.precio;
+            let td3 = document.createElement('td');
+                td3.innerHTML = json.stock + json.um
+            let td4 = document.createElement('td');
+            let td4_input = document.createElement('input');
+                td4_input.setAttribute('type', "number");
+                td4_input.setAttribute('placeholder', "Cant.");
+                td4_input.setAttribute('data-idProducto', json.id);
+                td4_input.setAttribute('data-costo', json.costo);
+                td4_input.setAttribute('data-precio', json.precio);
+                td4_input.setAttribute('data-reglasPrecios', json.reglaprecios);
+                td4_input.setAttribute('data-cantidadAnterior', 0);
+                td4_input.setAttribute('data-tipoCampo', 'productoAsignado');
+                td4_input.setAttribute('name', 'productoAsignado['+json.id+']');
+                td4_input.onchange = function(){
+                    calcularTotales();
+                }
+            let td5 = document.createElement('td');
+                td5.setAttribute('id', 'precioProducto_'+json.id);
+                td5.innerHTML = '$0';
+            let td6 = document.createElement('td');
+            let td6_eliminar = document.createElement('img');
+                td6_eliminar.setAttribute('src', "{{asset('images/iconos/cancelar.svg')}}");
+                td6_eliminar.setAttribute('alt', "Sacar producto");
+                td6_eliminar.setAttribute('title', "Sacar producto");
+                td6_eliminar.onclick = function(){
+                    sacarProductoVenta(this);
+                };
+
+            tr.append(td1);
+            tr.append(td21);
+            tr.append(td2);
+            tr.append(td3);
+            td4.append(td4_input);
+            tr.append(td4);
+            tr.append(td5);
+            td6.append(td6_eliminar);
+            tr.append(td6);
+            document.getElementById('productosAsignadosVenta').prepend(tr);
+        }
+    }
+
+    function calcularTotales(){
+        let precioTotal = 0;
+        let costoTotal = 0;
+        document.querySelectorAll('[data-tipocampo="productoAsignado"]').forEach(function(item, index){
+            let precioItem = item.dataset.precio;
+            let cantidad = item.value;
+            let id = item.dataset.idproducto;
+
+            // REVISO LAS REGLAS PARA CADA PRDUCTO
+            let reglasPrecios = item.dataset.reglasprecios;
+            reglasPrecios.split('|').forEach(function(item, index){
+                if(item != ''){
+                    let regla = item.split('-');
+                    if(cantidad >= parseInt(regla[0])){
+                        precioItem = regla[1];
+                    }
+                }
+            });
+            document.querySelectorAll('[data-preciotxt="precio_txt_'+id+'"]')[0].innerHTML = '$'+precioItem;
+
+
+            let costoTotalItem = item.dataset.costo * item.value;
+            let precioTotalItem = precioItem * item.value;
+            costoTotal += costoTotalItem;
+            precioTotal += precioTotalItem;
+            costoTotalItem = new Intl.NumberFormat("de-DE").format(costoTotalItem);
+            precioTotalItem = new Intl.NumberFormat("de-DE").format(precioTotalItem);
+            document.getElementById('precioProducto_'+id).innerHTML = "$"+precioTotalItem;
+        });
+        costoTotal = new Intl.NumberFormat("de-DE").format(costoTotal);
+        precioTotal = new Intl.NumberFormat("de-DE").format(precioTotal);
+        document.getElementById('productosPrecioTotal').innerHTML = "$"+precioTotal;
+        document.getElementById('costoTotalGral').innerHTML = "$"+costoTotal;
+        document.getElementById('precioTotalGral').innerHTML = "$"+precioTotal;
+    }
+
+    function sacarProductoCombo(self){
+        self.parentElement.parentElement.remove();
+        calcularTotales();
+    }
+
+    calcularTotales();
+</script>

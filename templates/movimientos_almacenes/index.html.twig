@@ -1,0 +1,55 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Movimientos entre almacenes{% endblock %}
+
+{% block rutas %}<span>Movimientos entre almacenes</span>{% endblock %}
+
+{% block contenido %}
+
+    <div class='filtros'>
+        <a href="{{ path('movimientos_almacenes_pedido_nuevo') }}"><img src="{{asset('images/iconos/nuevo.png')}}" alt="" /></a>
+    </div>
+    <table class="tablaListados">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Emisor</th>
+                <th>Receptor</th>
+                <th>Estado</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for m in movimientos %}
+            <tr>
+                <td>{{ m.id }}</td>
+                <td>{{ m.desde.nombre }}</td>
+                <td>{{ m.hacia.nombre }}</td>
+                <td>
+                    {{ (m.estado == 1) ? 'Pedido realizado' }}
+                    {{ (m.estado == 2) ? 'Pedido enviado' }}
+                    {{ (m.estado == 3) ? 'Pedido recibido' }}
+                </td>
+                <td style='text-align:right;'>
+                    {% if (m.estado == 1) %}
+                        <a href="{{ path('movimientos_almacenes_pedido_editar', {'id': m.id}) }}"><img src="{{asset('images/iconos/editar_off.png')}}" alt="" title="Editar pedido" /></a>
+                        <a href="{{ path('movimientos_almacenes_envio', {'id': m.id}) }}"><img src="{{asset('images/iconos/envio.svg')}}" alt="" title="Cargar envio" /></a>
+                    {% endif %}
+                    {% if (m.estado == 2) %}
+                        <a href="{{ path('movimientos_almacenes_envio', {'id': m.id}) }}"><img src="{{asset('images/iconos/envio.svg')}}" alt="" title="Modificar envio" /></a>
+                        <a href="{{ path('movimientos_almacenes_recepcion', {'id': m.id}) }}"><img src="{{asset('images/iconos/editar-stock_off.png')}}" alt="" title="Cargar recepción" /></a>
+                    {% endif %}
+                    {% if (m.estado == 3) %}
+                        <a href="{{ path('movimientos_almacenes_detalles', {'id': m.id}) }}"><img src="{{asset('images/iconos/ver-comprobante_off.png')}}" alt="" title="Ver detalle del movimiento" style="width:16px;" /></a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">No se encontraron movimientos entre almacenes.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

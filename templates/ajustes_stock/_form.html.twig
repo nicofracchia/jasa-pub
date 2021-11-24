@@ -1,0 +1,54 @@
+<form method="post" action="{{ path('ajustes_stock_nuevo', {'id_producto': producto.id}) }}">
+    <div id="productos">
+		<div>
+			<label for="almacen" class="required">Almacen</label>
+			{% if is_granted('ROLE_ADMIN') %}
+				<select id="almacen" name="ajuste[almacen]" onchange="cambioAlmacen(this);" required="required">
+					<option value="" selected>Seleccionar...</option>
+					{% for almacen in almacenes %}
+						<option value="{{ almacen.id }}" data-stock="{{ almacen.stock }}">{{ almacen.nombre }}</option>
+					{% endfor %}
+				</select>
+			{% else %}
+				<span>{{ app.user.almacen.nombre }}</span>
+				<input type='hidden' name="ajuste[almacen]" value="{{ app.user.almacen.id }}" onload="cambioAlmacen(this);" />
+			{% endif %}
+		</div>
+		<div>
+			<label for="ajuste_merma" class="required">Ajuste / merma</label>
+			<input type="number" id="ajuste_merma" name="ajuste[merma]" maxlength="255" required="required" value="" onchange="stockSegunMerma();">
+		</div>
+		<div>
+			<label for="ajuste_stock_real" class="required">Stock real</label>
+			<input type="text" id="ajuste_stock_real" name="ajuste[stock_real]" required="required" value="" onchange="mermaSegunStock();" readonly>
+		</div>
+		<div class="infoFrm">
+			<p><b>Stock Actual: </b> <span id="stockActualInfo">0</span> {{unidadMedida.nombre}}</p>
+			<p><b>Costo en stock: </b> $<span id="costoActualInfo">0</span> </p>
+			<p><b>Precio en stock: </b> $<span id="precioActualInfo">0</span> </p>
+		</div>
+        <div>
+			<label for="ajuste_motivo" class="required">
+				Motivo de ajuste
+				<img src="{{asset('images/iconos/nuevo.svg')}}" class='btnNuevoModal' alt="Nuevo motivo de ajuste" title="Nuevo motivo de ajuste" onclick="oGen.fnCargaModal('{{path('motivos_ajustes_stock_modal')}}')" />
+			</label>
+			<select id="ajuste_motivo" name="ajuste[motivo]" required="required" onchange='stockSegunMerma();'>
+				<option value="">Seleccionar...</option>
+				{% for motivo in motivos %}
+					<option value="{{motivo.id}}">{{motivo.nombre}} {{(motivo.tipo == 1) ? ' (+)' : ' (-)'}}</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div>
+			<label for="ajuste_observaciones">Observaciones</label>
+			<textarea id="ajuste_observaciones" name="ajuste[observaciones]"></textarea>
+		</div>
+	</div>
+	<input type="hidden" id="ajuste_stock_actual" name="ajuste[stock_actual]" value="{{producto.stockActual}}">
+	<input type="hidden" id="ajuste_costo_stock_actual" value="{{ producto.costo }}">
+	<input type="hidden" id="ajuste_precio_stock_actual" value="{{ producto.precioFinal }}">
+	<input type="hidden" name="_token" value="{{ csrf_token('nuevoAjusteDeStock') }}">
+	<div class="botonesFormularios">
+		<button class="btn btnGuardar">{{ button_label|default('Guardar') }}</button>
+	</div>
+</form>

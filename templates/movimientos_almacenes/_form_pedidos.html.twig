@@ -1,0 +1,146 @@
+{% set almacenSelDesde = pedido.desde.id ?? '' %}
+{% set almacenSelHacia = pedido.hacia.id ?? '' %}
+{% set edicion = (pedido is defined) ? true : false %}
+
+<form method="post" action="{{ (edicion) ? path('movimientos_almacenes_pedido_editar', {'id': pedido.id}) : path('movimientos_almacenes_pedido_nuevo') }}">
+
+    <div>
+        <div>
+            <label for="pedido_desde" class="required">Emisor</label>
+            <select id="pedido_desde" name="pedido[desde]" required="required"  data-idBuscadorProductos="almacen">
+                <option value="">Seleccionar...</option>
+                {% for almacen in almacenes %}
+                    <option value="{{almacen.id}}" {{ (almacenSelDesde == almacen.id) ? 'selected' : '' }}>{{almacen.nombre}} - {{almacen.direccion}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="pedido_hacia" class="required">Receptor</label>
+            <select id="pedido_hacia" name="pedido[hacia]" required="required">
+                <option value="">Seleccionar...</option>
+                {% for almacen in almacenes %}
+                    <option value="{{almacen.id}}" {{ (almacenSelHacia == almacen.id) ? 'selected' : '' }}>{{almacen.nombre}} - {{almacen.direccion}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div></div>
+        <div>
+            <label>Productos</label>
+            {{ include('generales/busProductos.html.twig',{
+                'nombreCampoProducto' : '',
+                'busProductoSel' : '',
+                'busProductoSelTxt' : '',
+                'callbackCargar' : 'agregarProductoAPedido();'
+            }) }}
+        </div>
+        <div>
+            <label>Productos asignados</label>
+            <table class="tablaProductosAsignados">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Stock actual</th>
+                        <th>Cantidad</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id='productosAsignadosPedido'>
+                    {% for p in productosAsignados %}
+                        <tr id="productoAgregado_{{p.id}}">
+                            <td>{{p.titulo}}</td>
+                            <td>{{p.stockActual ~ p.unidad}}</td>
+                            <td>
+                                <input 
+                                    type="number" 
+                                    placeholder="Cant." 
+                                    data-idproducto="{{p.id}}" 
+                                    data-cantidadanterior="{{p.cantidad}}" 
+                                    data-tipocampo="productoAsignado" 
+                                    name="productoAsignado[{{p.id}}]" 
+                                    value="{{p.cantidad}}"
+                                />
+                            </td>
+                            <td class="actions">
+                                <img src="/images/iconos/cancelar.svg" alt="Sacar producto" title="Sacar producto" onclick="sacarProductoPedido(this);" />
+                            </td>
+                        </tr>
+                    {% endfor %}                
+                </tbody>
+            </table>
+        </div>
+        <div></div>
+    </div>
+    <input type="hidden" name="_token" value="{{ (edicion) ? csrf_token('editar_pedido_'~pedido.id) : csrf_token('nuevo_pedido') }}">
+    <div class="botonesFormularios">
+        <a href="{{ path('movimientos_almacenes_index') }}" class='btn btnCancelar'>Cancelar</a>
+        <button class="btn btnGuardar" name='guardar' value='1'>Guardar</button>
+        <br/><br/>
+    </div>
+</form>
+
+<script>
+    function agregarProductoAPedido(){
+        let idProducto = document.getElementById('hiddenProductoId').value;
+        let idAlmacen = document.querySelector('[data-idBuscadorProductos="almacen"]').value;
+
+        let formData = new FormData();
+            formData.append("idProducto", idProducto);
+            formData.append("idAlmacen", idAlmacen);
+
+        fetch("{{ path('pedidos_productos') }}", {
+            method: 'post',
+            mode: 'cors',
+            credentials: 'same-origin',
+            body: formData
+        }).then(function(response){
+            return response.json();
+        }).then(function(json){
+            cargaProductoListado(json);
+            document.getElementById('buscador_productos').value = '';
+            document.getElementById('hiddenProductoId').value = '';
+        }).catch(function(error){
+            console.log('ERROR:', error);
+        })
+    }
+
+    function cargaProductoListado(json){
+        
+        if(document.getElementById('productoAgregado_'+json.id) === null){
+
+            let tr = document.createElement('tr');
+                tr.setAttribute('id', 'productoAgregado_'+json.id);
+            let td1 = document.createElement('td');
+                td1.innerHTML = json.titulo;
+            let td3 = document.createElement('td');
+                td3.innerHTML = json.stock + json.um
+            let td4 = document.createElement('td');
+            let td4_input = document.createElement('input');
+                td4_input.setAttribute('type', "number");
+                td4_input.setAttribute('placeholder', "Cant.");
+                td4_input.setAttribute('data-idProducto', json.id);
+                td4_input.setAttribute('data-cantidadAnterior', 0);
+                td4_input.setAttribute('data-tipoCampo', 'productoAsignado');
+                td4_input.setAttribute('name', 'productoAsignado['+json.id+']');
+            let td6 = document.createElement('td');
+            let td6_eliminar = document.createElement('img');
+                td6_eliminar.setAttribute('src', "{{asset('images/iconos/cancelar.svg')}}");
+                td6_eliminar.setAttribute('alt', "Sacar producto");
+                td6_eliminar.setAttribute('title', "Sacar producto");
+                td6_eliminar.onclick = function(){
+                    sacarProductoPedido(this);
+                };
+
+            tr.append(td1);
+            tr.append(td3);
+            td4.append(td4_input);
+            tr.append(td4);
+            td6.append(td6_eliminar);
+            tr.append(td6);
+            document.getElementById('productosAsignadosPedido').prepend(tr);
+        }
+    }
+
+    function sacarProductoPedido(self){
+        self.parentElement.parentElement.remove();
+    }
+</script>

@@ -1,0 +1,61 @@
+{% set fechaPedido = compra.fecha ?? "now" %}
+{% set fechaRecepcion = compra.recepcion ?? '0000-00-00' %}
+{% set almacenSel = compra.almacen.id ?? 0 %}
+{% set proveedorSel = compra.proveedor.id ?? 0 %}
+{% set estadoSel = compra.estado ?? '' %}
+{% set edicion = (compra is defined) ? true : false %}
+
+<div id="productos">
+    <div>
+        <label for="compra_pedido" class="required">Fecha pedido</label>
+        <input type="date" id="compra_pedido" name="compra[fecha]" required="required" data-formateado="" onchange="setDateFormatArgentina(this);" value="{{ fechaPedido|date("Y-m-d") }}">
+    </div>
+    <div>
+        <label for="compra_recepcion">Fecha de entrega</label>
+        <input type="date" id="compra_recepcion" name="compra[recepcion]" data-formateado="" onchange="setDateFormatArgentina(this);" value="{{ fechaRecepcion|date("Y-m-d") }}">
+    </div>
+    <div>
+        <label for="compra_almacen" class="required">Almacen</label>
+        <select id="compra_almacen" name="compra[almacen]" required="required">
+            <option value="">Seleccionar...</option>
+            {% for almacen in almacenes %}
+                <option value="{{almacen.id}}" {{ (almacenSel == almacen.id) ? 'selected' : '' }}>{{almacen.nombre}} - {{almacen.direccion}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <label for="compra_proveedor" class="required">Proveedor</label>
+        <select id="compra_proveedor" name="compra[proveedor]" required="required">
+            <option value="">Seleccionar...</option>
+            {% for proveedor in proveedores %}
+                <option value="{{proveedor.id}}" {{ (proveedorSel == proveedor.id) ? 'selected' : '' }}>{{proveedor.nombre}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <label for="compra_estado">Estado</label>
+        <select id="compra_estado" name="compra[estado]">
+            <option {{ (estadoSel == "Espera respuesta") ? 'selected' : '' }}>Espera respuesta</option>
+            <option {{ (estadoSel == "En camino") ? 'selected' : '' }}>En camino</option>
+            <option {{ (estadoSel == "Recibido") ? 'selected' : '' }}>Recibido</option>
+        </select>
+    </div>
+    <div></div>
+</div>
+<input type="hidden" name="_token" value="{{ (edicion) ? csrf_token('editar_compra_'~compra.id) : csrf_token('nueva_compra') }}">
+<div class="botonesFormularios">
+    <a href="{{ path('compras_index') }}" class='btn btnCancelar'>Cancelar</a>
+    <button class="btn btnGuardar" name='guardar' value='1'>Guardar</button>
+    <button class="btn btnGuardar" name='guardar' value='2'>Guardar y cargar productos</button>
+</div>
+
+<script>
+    setDateFormatArgentina = function(el){
+        let val = el.value.split('-');
+        if(val.length > 1){
+            fechaFormateada = val[2]+'/'+val[1]+'/'+val[0];
+            el.setAttribute('data-formateado', fechaFormateada);
+        }
+    }
+    document.querySelectorAll('input[type=date]').forEach(setDateFormatArgentina);
+</script>

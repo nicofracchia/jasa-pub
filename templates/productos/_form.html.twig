@@ -1,0 +1,97 @@
+<form method="post" action="{{ path('productos_edit_manual', {'id': producto.id}) }}">
+    <div id="productos">
+		<div>
+			<label for="productos_titulo" class="required">Titulo</label>
+			<input type="text" id="productos_titulo" name="productos[titulo]" required="required" maxlength="255" value="{{producto.titulo}}">
+		</div>
+		<div>
+			<label for="productos_codigo_barras">Codigo barras</label>
+			<input type="text" id="productos_codigo_barras" name="productos[codigo_barras]" maxlength="255" value="{{producto.codigoBarras}}">
+		</div>
+		<div>
+			<label for="productos_categoria">Categoría</label>
+			<select id="productos_categoria" name="productos[categoria]">
+				{% for categoria in categorias %}
+
+					{% set seleccionada = "" %}
+					{% set claseOG = "" %}
+					
+					{% if producto.categoria.id == categoria.id %}
+						{% set seleccionada = "selected" %}
+					{% endif %}
+
+					{% if categoria.idPadre == 0 %}
+						{% set claseOG = "class=labelCategoriaPadre" %}
+					{% endif %}
+
+					{% if categoria.final == 1 %}
+						<option value="{{categoria.id}}" {{seleccionada}}>{{categoria.nombre}}</option>
+					{% else %}
+						</optgroup><optgroup label="{{categoria.nombre}}" {{claseOG}}>
+					{% endif %}
+
+				{% endfor %}
+			</select>
+		</div>
+        <div>
+			<label for="productos_costo" class="required">Costo</label>
+			<input type="text" id="productos_costo" name="productos[costo]" required="required" value="{{producto.costo}}">
+		</div>
+		<div>
+			<label for="productos_porcentaje_costo" class="required">Porcentaje costo</label>
+			<input type="text" id="productos_porcentaje_costo" name="productos[porcentaje_costo]" required="required" value="{{producto.porcentajeCosto}}">
+		</div>
+		<div>
+			<label for="productos_precio_final" class="required">Precio final</label>
+			<input type="text" id="productos_precio_final" name="productos[precio_final]" required="required" value="{{producto.precioFinal}}">
+		</div>
+		<div>
+			<label for="productos_stock_actual" class="required">Stock actual</label>
+			<input type="number" id="productos_stock_actual" name="productos[stock_actual]" required="required" value="{{producto.stockActual}}">
+		</div>
+		<div>
+			<label for="productos_stock_minimo" class="required">Stock minimo</label>
+			<input type="number" id="productos_stock_minimo" name="productos[stock_minimo]" required="required" value="{{producto.stockMinimo}}">
+		</div>
+		<div>
+			<label for="productos_id_unidad_medida" class="required">Unidad de medida</label>
+			<select id="productos_id_unidad_medida" name="productos[id_unidad_medida]">
+				<option value="1" {% if producto.idUnidadMedida.id == "1" %} selected {% endif %} >Centímetros</option>
+				<option value="2" {% if producto.idUnidadMedida.id == "2" %} selected {% endif %} >Mililitros</option>
+				<option value="3" {% if producto.idUnidadMedida.id == "3" %} selected {% endif %} >Unidades</option>
+			</select>
+		</div>
+		<div>
+			<label for="productos_descripcion">Descripcion</label>
+			<textarea id="productos_descripcion" name="productos[descripcion]">{{producto.descripcion}}</textarea>
+		</div>
+		<div>
+			<label for="productos_habilitado">Habilitado</label>
+			<input type="checkbox" id="productos_habilitado" name="productos[habilitado]" value="1" {% if producto.habilitado == "1" %} checked="checked" {% endif %}>
+		</div>
+		<input type="hidden" id="productos__token" name="productos[_token]" value="{{ csrf_token('edit' ~ producto.id) }}">
+	</div>
+    <input type="hidden" name="_token" value="{{ csrf_token('editar' ~ producto.id) }}">
+    <button class="btn">Guardar</button>
+</form>
+
+<script>
+	function precioFinal(){
+		let costo = parseFloat(document.getElementById('productos_costo').value);
+		let porcentajeCosto = parseFloat(document.getElementById('productos_porcentaje_costo').value);
+		if(!isNaN(costo) && !isNaN(porcentajeCosto)){
+			let precioSugerido = parseInt(costo * porcentajeCosto);
+			let ultimo = precioSugerido.toString().slice(-1);
+			if(ultimo != 0)
+				precioSugerido = precioSugerido + 10 - ultimo;
+			document.getElementById('productos_precio_final').value = precioSugerido;
+		}
+
+	}
+	document.querySelector("#productos_costo").onkeypress = function(e) {
+		return "0123456789.".indexOf(String.fromCharCode(e.which)) >= 0;
+	};
+	document.querySelector("#productos_porcentaje_costo").onkeypress = function(e) {
+		return "0123456789.".indexOf(String.fromCharCode(e.which)) >= 0;
+	};
+</script>

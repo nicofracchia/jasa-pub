@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}UnidadesMedida{% endblock %}
+
+{% block body %}
+    <h1>UnidadesMedida</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ unidades_medida.id }}</td>
+            </tr>
+            <tr>
+                <th>Nombre</th>
+                <td>{{ unidades_medida.nombre }}</td>
+            </tr>
+            <tr>
+                <th>Nombre_padre</th>
+                <td>{{ unidades_medida.nombrePadre }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('unidades_medida_index') }}">back to list</a>
+
+    <a href="{{ path('unidades_medida_edit', {'id': unidades_medida.id}) }}">edit</a>
+
+    {{ include('unidades_medida/_delete_form.html.twig') }}
+{% endblock %}

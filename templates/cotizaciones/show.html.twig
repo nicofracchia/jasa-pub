@@ -1,0 +1,98 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Cotizaciones{% endblock %}
+
+{% block rutas %}Cotizaciones > <span>Detalles de la cotización</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('cotizaciones_show', {'id': cotizacion.id}) }}" class="actual">Detalles de la cotización</a>
+    <a href="{{ path('cotizaciones_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Detalles de la cotización</h1>
+    
+    <table class='tablaCotizacionVentaDetalle'>
+        <tr>
+            <th>Almacen:</th>
+            <td>{{cotizacion.almacen.nombre}} - {{cotizacion.almacen.direccion}}</td>
+        </tr>
+        <tr>
+            <th>Fecha:</th>
+            <td>{{"NOW"|date('d/m/Y')}}</td>
+        </tr>
+        <tr>
+            <th>Estado:</th>
+            <td>
+                <a href="{{ path('ventas_edit', {'id': cotizacion.venta.id}) }}" style='text-decoration:underline; cursor:pointer; color:blue;'>Venta</a>
+            </td>
+        </tr>
+        <tr>
+            <th>Cliente:</th>
+            <td>
+                {{cotizacion.idCliente.nombre|capitalize}} {{cotizacion.idCliente.apellido|capitalize}}<br/>
+                {{cotizacion.idCliente.mail}} | {{cotizacion.idCliente.telefono}}<br/>
+                {{cotizacion.idCliente.direccion}}
+            </td>
+        </tr>
+        <tr>
+            <th colspan=2>
+                <br/><br/><br/>
+                {{ (cotizacion.mantenerPrecio) ? "Se mantiene el precio fijado al momento de la cotización: "~cotizacion.fecha|date('d/m/Y') : "No se fijaron los precios al momento de la cotización: "~cotizacion.fecha|date('d/m/Y') }}
+                <br/><br/><br/>
+            </th>
+        </tr>
+    </table>
+
+    <form method="post" action="{{ path('ventas_new') }}">
+        <input type="hidden" name="venta[fecha]" value="{{"NOW"|date('d/m/Y')}}" />
+        <input type="hidden" name="venta[cliente]" value="{{cotizacion.idCliente.id}}" />
+        <input type="hidden" name="venta[estado]" value="Preventa" />
+        <input type="hidden" name="venta[almacen]" value="{{cotizacion.almacen.id}}" />
+        <input type="hidden" name="venta[cotizacion]" value="{{cotizacion.id}}" />
+
+        <table class="tablaProductosAsignados">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody id='productosAsignadosCotizacion'>
+                {% for p in productosAsignados %}
+                    <input type="hidden" name="productoAsignado[{{p.id}}]" value="" />
+                    <tr id="productoAgregado_{{p.id}}">
+                        <td>{{p.titulo}}</td>
+                        <td>${{p.precio|number_format(2, ',', '.')}}</td>
+                        <td>
+                            {% if (p.reservado == 1) %}
+                                {{p.cantidad|number_format(0, ',', '.') ~ p.unidad}}
+                                <input type="hidden" name="productoAsignado[{{p.id}}]" value="{{p.cantidad}}" />
+                                <input type="hidden" name="stockReservado[]" value="{{p.id}}" />
+                            {% elseif (p.reservado == 0 and p.stockActual < p.cantidad) %}
+                                {{p.stockActual|number_format(0, ',', '.') ~ p.unidad}}
+                                <input type="hidden" name="productoAsignado[{{p.id}}]" value="{{p.stockActual}}" />
+                            {% else %}
+                                {{p.cantidad|number_format(0, ',', '.') ~ p.unidad}}
+                                <input type="hidden" name="productoAsignado[{{p.id}}]" value="{{p.cantidad}}" />
+                            {% endif %}
+                        </td>
+                        <td id="precioProducto_{{p.id}}">
+                            ${{(p.precio * p.cantidad)|number_format(0, ',', '.')}}
+                        </td>
+                    </tr>
+                {% endfor %}                
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan=3>TOTAL:</td>
+                    <td id='productosPrecioTotal'>${{(precioTotal ?? 0)|number_format(0, ',', '.')}}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </form>
+{% endblock %}

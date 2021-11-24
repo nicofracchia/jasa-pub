@@ -1,0 +1,18 @@
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+    <div class="botonesFormularios">
+        <a href="{{ path('almacenes_index') }}" class='btn btnCancelar'>Cancelar</a>
+        <button class="btn btnGuardar">{{ button_label|default('Save') }}</button>
+        {% if almacene.id is defined and almacene.id != null %}
+            <button class="btn btnEliminar" type="button" onclick="eliminar();">Eliminar</button>
+        {% endif %}
+    </div>
+
+{{ form_end(form) }}
+
+<script>
+    function eliminar(){
+        if(confirm('Seguro que desea eliminar este almacen?'))
+            document.getElementById('frmEliminar').submit();
+    }
+</script>

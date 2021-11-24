@@ -1,0 +1,20 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - ventas{% endblock %}
+
+{% block rutas %}Ventas > <span>Asignar productos</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('ventas_edit', {'id': venta.id}) }}">Detalles de la venta</a>
+    <a href="{{ path('ventas_productos', {'id': venta.id}) }}" class="actual">Productos de la venta</a>
+    <a href="{{ path('ventas_pagos', {'id': venta.id}) }}">Pagos</a>
+    <a href="{{ path('ventas_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Productos de la venta</h1>
+
+    {{ include('ventas_productos/_form.html.twig') }}
+{% endblock %}

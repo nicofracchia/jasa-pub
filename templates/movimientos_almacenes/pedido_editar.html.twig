@@ -1,0 +1,18 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Movimientos entre almacenes{% endblock %}
+
+{% block rutas %}Movimientos entre almacenes > <span>Editar pedido</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('movimientos_almacenes_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Detalles del pedido</h1>
+
+    {{ include('movimientos_almacenes/_form_pedidos.html.twig') }}
+
+{% endblock %}

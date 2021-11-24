@@ -1,0 +1,51 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Usuarios{% endblock %}
+
+{% block rutas %}<span>Usuarios</span>{% endblock %}
+
+{% block contenido %}
+   
+    <div class='filtros'>
+        <a href="{{ path('usuarios_new') }}"><img src="{{asset('images/iconos/nuevo.png')}}" alt="" /></a>
+    </div>
+    <table class="tablaListados">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Apellido</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Direccion</th>
+                <th>Habilitado</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for usuario in usuarios %}
+            <tr>
+                <td>{{ usuario.id }}</td>
+                <td>{{ usuario.apellido }}</td>
+                <td>{{ usuario.nombre }}</td>
+                <td>{{ usuario.email }}</td>
+                <td>{{ usuario.direccion }}</td>
+                <td>
+                    {% if usuario.habilitado == 1 %}
+                        Habilitado
+                    {% else %}
+                        Deshabilitado
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ path('usuarios_edit', {'id': usuario.id}) }}"><img src="{{asset('images/iconos/editar_off.png')}}" alt="" /></a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="9">No se encontraron usuarios.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

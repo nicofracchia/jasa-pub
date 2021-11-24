@@ -1,0 +1,56 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Proveedores{% endblock %}
+
+{% block rutas %}<span>Proveedores</span>{% endblock %}
+
+{% block contenido %}
+
+    <div class='filtros'>
+        <a href="{{ path('proveedores_new') }}"><img src="{{asset('images/iconos/nuevo.png')}}" alt="" /></a>
+    </div>
+    <table class="tablaListados">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Cuit</th>
+                <th>Telefono</th>
+                <th>Mail</th>
+                <th>Direccion</th>
+                <th>Notas</th>
+                <th>Habilitado</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for proveedore in proveedores %}
+            <tr>
+                <td>{{ proveedore.id }}</td>
+                <td>{{ proveedore.nombre }}</td>
+                <td>{{ proveedore.cuit }}</td>
+                <td>{{ proveedore.telefono }}</td>
+                <td>{{ proveedore.mail }}</td>
+                <td>{{ proveedore.direccion }}</td>
+                <td>{{ proveedore.notas }}</td>
+                <td>
+                    {% if proveedore.habilitado == 1 %}
+                        Habilitado
+                    {% else %}
+                        Deshabilitado
+                    {% endif %}
+
+                </td>
+                <td>
+                    <a href="{{ path('proveedores_edit', {'id': proveedore.id}) }}"><img src="{{asset('images/iconos/editar_off.png')}}" alt="" /></a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="10">No se encontraron proveedores.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

@@ -1,0 +1,330 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Productos{% endblock %}
+
+{% block rutas %}Productos > <span>Editar producto > Detalles de producto</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('productos_edit_manual', {'id': producto.id}) }}" class="actual">Detalles de producto</a>
+    <a href="{{ path('productos_imagenes', {'id': producto.id}) }}">Imágenes</a>
+    <a href="{{ path('ajustes_stock_nuevo', {'id_producto': producto.id}) }}">Ajustes de stock</a>
+    <a href="{{ path('productos_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Detalles del producto</h1>
+    {% set st = 0 %}
+    {% for spa in productosAlmacenes %}
+        {% set st = st + spa %}
+    {% endfor %}
+    <label>Stock actual: {{st ~ ' ' ~ producto.idUnidadMedida.nombre}} </label>
+    <form method="post" action="{{ path('productos_edit_manual', {'id': producto.id}) }}" onsubmit="return validaFrm();">
+        <div id="productos">
+            <div>
+                <label> </label>
+                <div class="contCheckBox">
+                    <input type="checkbox" id="productos_material_reparacion" name="productos[material_reparacion]" value="1" {% if producto.materialReparacion == "1" %} checked="checked" {% endif %}>
+                    <label for="productos_material_reparacion">Material para reparaciones</label>
+                </div>
+            </div>
+            <div></div>
+            <div></div>
+            <div>
+                <label for="productos_titulo" class="required">Titulo</label>
+                <input type="text" id="productos_titulo" name="productos[titulo]" required="required" maxlength="255" value="{{producto.titulo}}">
+            </div>
+            <!--
+            <div>
+                <label for="productos_codigo_barras">Codigo barras</label>
+                <input type="text" id="productos_codigo_barras" name="productos[codigo_barras]" maxlength="255" value="{{producto.codigoBarras}}">
+            </div>
+            -->
+            <div>
+                <label for="productos_iva" class="required">% IVA</label>
+                <input type="number" id="productos_iva" name="productos[iva]" required="required" value="{{producto.iva}}" step=".01">
+            </div>
+            <div>
+                <label for="productos_costo" class="required">Costo</label>
+                <input type="text" id="productos_costo" name="productos[costo]" required="required" value="{{producto.costo}}" onchange="precioFinal();">
+            </div>
+            <div>
+                <label for="productos_porcentaje_costo" class="required">Porcentaje costo</label>
+                <input type="text" id="productos_porcentaje_costo" name="productos[porcentaje_costo]" required="required" value="{{producto.porcentajeCosto}}" onchange="precioFinal();">
+            </div>
+            <div>
+                <label for="productos_precio_final" class="required">Precio final</label>
+                <input type="text" id="productos_precio_final" name="productos[precio_final]" required="required" value="{{producto.precioFinal}}">
+            </div>
+            <div>
+                <label for="productos_stock_minimo" class="required">Stock minimo</label>
+                <input type="number" id="productos_stock_minimo" name="productos[stock_minimo]" required="required" step=".01" value="{{producto.stockMinimo}}">
+            </div>
+            <div>
+                <label for="productos_id_unidad_medida" class="required">Unidad de medida</label>
+                <select id="productos_id_unidad_medida" name="productos[id_unidad_medida]">
+                    <option value="1" {% if producto.idUnidadMedida.id == "1" %} selected {% endif %} >Centímetros</option>
+                    <option value="2" {% if producto.idUnidadMedida.id == "2" %} selected {% endif %} >Mililitros</option>
+                    <option value="3" {% if producto.idUnidadMedida.id == "3" %} selected {% endif %} >Unidades</option>
+                </select>
+            </div>
+            <div>
+                <label for="productos_descripcion">Descripcion</label>
+                <textarea id="productos_descripcion" name="productos[descripcion]">{{producto.descripcion}}</textarea>
+            </div>
+            <div>
+                <label> </label>
+                <div class="contCheckBox">
+                    <input type="checkbox" id="productos_habilitado" name="productos[habilitado]" value="1" {% if producto.habilitado == "1" %} checked="checked" {% endif %}>
+                    <label for="productos_habilitado">Habilitado</label>
+                </div>
+            </div>
+            <div>
+                <label>
+                    Precios por cantidad
+                    <img src="{{asset('images/iconos/nuevo.svg')}}" class="btnNuevoModal" alt="Agregar regla" title="Agregar regla" onclick="oGen.fnCargaReglaPreciosProductos()">
+                </label>
+                <table>
+                    <tbody id='tablaReglasProductos'>
+                        {% for rp in reglasPrecios %}
+                            <tr>
+                                <td><input type='number' step=".01" name="reglasCantidad[{{rp.id}}]" data-reglas="cantidad" data-idRegla="{{rp.id}}" value="{{rp.cantidad}}" placeholder="Cantidad" /></td>
+                                <td><input type='number' step=".01" name="reglasPrecio[{{rp.id}}]" data-reglas="precio" data-idRegla="{{rp.id}}" value="{{rp.precio}}" placeholder="Precio" /></td>
+                                <td><img src="{{asset('images/iconos/borrar_rojo.svg')}}" alt="Eliminar regla" title="Eliminar regla" onclick="oGen.fnElimiaReglaPreciosProductos(this)"></td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <td><input type='number' step=".01" name="reglasCantidad[0]" data-reglas="cantidad" data-idRegla="0" placeholder="Cantidad" /></td>
+                            <td><input type='number' step=".01" name="reglasPrecio[0]" data-reglas="precio" data-idRegla="0" placeholder="Precio" /></td>
+                            <td><img src="{{asset('images/iconos/borrar_rojo.svg')}}" alt="Eliminar regla" title="Eliminar regla" onclick="oGen.fnElimiaReglaPreciosProductos(this)"></td>
+                        </tr>
+                    </tbody>   
+                </table>
+            </div>
+            <div>
+                <label>Almacenes</label>
+                {% for almacen in almacenes %}
+                    {% set chk = "" %}
+                    {% set stockAlmacen = 0 %}
+                    {% if almacen.id in productosAlmacenes|keys %}
+                        {% set chk = " checked='checked'" %}
+                        {% set stockAlmacen = productosAlmacenes[almacen.id] %}
+                    {% endif %}
+                    <div class="contCheckBox">
+                        {% if stockAlmacen > 0 %}
+                            {% set modificarChk = " disabled" %}
+                        {% else %}
+                            {% set modificarChk = " " %}
+                        {% endif %}
+                        <input type="checkbox" name="almacenes[]" value="{{ almacen.id }}" id="almacen_{{ almacen.id }}" {{ chk }} {{modificarChk}} />
+                        <label for="almacen_{{ almacen.id }}">{{ almacen.nombre }}</label>
+                        {% if stockAlmacen > 0 %}<span style="color:var(--rojo);">({{ stockAlmacen ~ ' ' ~ producto.idUnidadMedida.nombre}} en stock.)</span>{% endif %}
+                    </div>
+                {% endfor %}
+                <input type='hidden' name='almacenes[]' value='0' />
+            </div>
+            <div>
+                <label for="productos_categoria">Categorías <img src="{{asset('images/iconos/editar_off.png')}}" alt="" onclick="mostrarCategorias();" style='cursor:pointer;'/></label>
+                <div class="contenedorCategorias categoriasFormularios" id="contCat_0">
+                    <img src="{{asset('images/iconos/cancelar.svg')}}" alt="" onclick="ocultarCategorias();" class='iconoEliminar' />
+                </div>
+                <div id="categoriasAgregadas">
+                    {% for ca in categoriasAsignadas %}
+                        <input type="hidden" name="categoriasProducto[]" id="inputCatAgregada_{{ca.id}}" value="{{ca.id}}">
+                        <label id="labelCatAgregada_{{ca.id}}">
+                            <img src="/images/iconos/borrar_rojo.svg"> {{ca.categoria}}
+                        </label>
+                    {% endfor %}
+                </div>
+            </div>
+            <div>
+                <label>Detalles</label>
+                <table class="tablaDetallesProducto">
+                    <tr>
+                        <td>Medidas:</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td> &nbsp;&nbsp;&nbsp;&middot; Diámetro:</td>
+                        <td><input type="number" id="productos_diametro" name="productos[diametro]" value="{{ producto.diametro }}" step=".01"></td>
+                    </tr>
+                    <tr>
+                        <td> &nbsp;&nbsp;&nbsp;&middot; Largo:</td>
+                        <td><input type="number" id="productos_largo" name="productos[largo]" value="{{ producto.largo }}" step=".01"></td>
+                    </tr>
+                    <tr>
+                        <td> &nbsp;&nbsp;&nbsp;&middot; Ancho:</td>
+                        <td><input type="number" id="productos_ancho" name="productos[ancho]" value="{{ producto.ancho }}" step=".01"></td>
+                    </tr>
+                    <tr>
+                        <td> &nbsp;&nbsp;&nbsp;&middot; Color:</td>
+                        <td><input type="text" id="productos_color" name="productos[color]" value="{{ producto.color }}"></td>
+                    </tr>
+                    <tr>
+                        <td> &nbsp;&nbsp;&nbsp;&middot; Material:</td>
+                        <td><input type="text" id="productos_material" name="productos[material]" value="{{ producto.material }}"></td>
+                    </tr>
+                    <tr>
+                        <td>Utilidad</td>
+                        <td><input type="text" id="productos_utilidad" name="productos[utilidad]" value="{{ producto.utilidad }}"></td>
+                    </tr>
+                    <tr>
+                        <td>Presentación</td>
+                        <td><input type="text" id="productos_presentacion" name="productos[presentacion]" value="{{ producto.presentacion }}"></td>
+                    </tr>
+                </table>
+            </div>
+            
+            <input type="hidden" id="productos__token" name="productos[_token]" value="{{ csrf_token('edit' ~ producto.id) }}">
+        </div>
+        <input type="hidden" name="_token" value="{{ csrf_token('editar' ~ producto.id) }}">
+        <div class="botonesFormularios">
+            <a href="{{ path('productos_index') }}" class='btn btnCancelar'>Cancelar</a>
+            <button class="btn btnGuardar">{{ button_label|default('Guardar') }}</button>
+            <button class="btn btnEliminar" type="button" onclick="eliminar();">Eliminar</button>
+        </div>
+    </form>
+
+    
+
+    {{ include('productos/_delete_form.html.twig') }}
+
+    <script>
+        function eliminar(){
+            if(confirm('Seguro que desea eliminar este producto?'))
+                document.getElementById('frmEliminar').submit();
+        }
+
+        function precioFinal(){
+            let costo = parseFloat(document.getElementById('productos_costo').value);
+            let porcentajeCosto = parseFloat(document.getElementById('productos_porcentaje_costo').value);
+            if(!isNaN(costo) && !isNaN(porcentajeCosto)){
+                let precioSugerido = parseInt(costo * (porcentajeCosto / 100 + 1));
+                let ultimo = precioSugerido.toString().slice(-1);
+                if(ultimo != 0)
+                    precioSugerido = precioSugerido + 10 - ultimo;
+                document.getElementById('productos_precio_final').value = precioSugerido;
+            }
+
+        }
+
+        document.querySelector("#productos_costo").onkeypress = function(e) {
+            return "0123456789.".indexOf(String.fromCharCode(e.which)) >= 0;
+        };
+        document.querySelector("#productos_porcentaje_costo").onkeypress = function(e) {
+            return "0123456789.".indexOf(String.fromCharCode(e.which)) >= 0;
+        };
+
+        function validaFrm(){
+            let almacenes = 0;
+            document.getElementsByName('almacenes[]').forEach(function(item, index){
+                if(item.checked)
+                    almacenes++;
+            });
+            if(almacenes == 0){
+                alert('Debe asignar un almacen al producto');
+                return false;
+            }
+            return true;
+        }
+
+        // FUNCIONES CATEGORIAS
+
+        var categoriasInicial = [{{catAgJS}}];
+
+         function getCategorias(){
+            fetch("{{ path('categorias_listado') }}", {
+                method: 'post',
+                mode: 'cors',
+                credentials: 'same-origin'
+            }).then(function(response){
+                return response.json();
+            }).then(function(ccc){
+                ccc.forEach(armarArbolCategorias);
+            }).catch(function(error){
+                console.error('ERROR:', error);
+            });
+        }
+
+        function armarArbolCategorias(item, index){
+            let divCont = document.createElement('div');
+            divCont.classList.add('contenedorCategorias');
+            divCont.setAttribute("id", "contCat_"+item.id);
+
+            let divCat = document.createElement('div');
+
+            let label = document.createElement('label');
+                label.setAttribute("for", "chkCat_"+item.id);
+                label.setAttribute("id", "labelCat_"+item.id);
+                label.innerHTML = item.nombre;
+            
+            let agregar = document.createElement('input');
+            agregar.setAttribute("type", "checkbox");
+            agregar.setAttribute("title", "Agregar sub categoría");
+            agregar.setAttribute("data-id", item.id);
+            agregar.setAttribute("id", "chkCat_"+item.id);
+            agregar.onchange = function () {
+                agregarCategoria(this);
+            };
+            if(categoriasInicial.indexOf(item.id) != -1)
+                agregar.checked = true;
+            
+            divCat.prepend(label);
+            divCat.prepend(agregar);
+
+            divCont.prepend(divCat);
+            
+            document.getElementById("contCat_"+item.idPadre).appendChild(divCont);
+        }
+
+        function agregarCategoria(self){
+            let id = self.dataset.id;
+
+            // ELIMINO LA CATEGORIA AGREGADA PARA EVITAR REPETICIONES
+            eliminarCategoria(id);
+
+            // SI ESTA CHECKEADO LA AGREGO
+            if(self.checked){
+                let eliminar = document.createElement('img');
+                    eliminar.setAttribute("src", "{{asset('images/iconos/borrar_rojo.svg')}}");
+                    eliminar.onclick = function(){
+                        eliminarCategoria(id);
+                    }
+
+                let label = document.createElement('label');
+                    label.setAttribute("id", "labelCatAgregada_"+id);
+                    label.innerHTML = document.getElementById('labelCat_'+id).innerHTML;
+
+                let input = document.createElement('input');
+                    input.setAttribute("type", "hidden");
+                    input.setAttribute("name", "categoriasProducto[]");
+                    input.setAttribute("id", "inputCatAgregada_"+id);
+                    input.value = id;
+
+                document.getElementById('categoriasAgregadas').append(input);
+                label.prepend(eliminar);
+                document.getElementById('categoriasAgregadas').append(label);
+            }
+        }
+
+        function mostrarCategorias(){
+            document.getElementById('contCat_0').style.display = 'block';
+        }
+
+        function ocultarCategorias(){
+            document.getElementById('contCat_0').style.display = 'none';
+        }
+
+        function eliminarCategoria(id){
+            if(document.getElementById('labelCatAgregada_'+id) !== null)
+                document.getElementById('labelCatAgregada_'+id).remove();
+            
+            if(document.getElementById('inputCatAgregada_'+id) !== null)
+                document.getElementById('inputCatAgregada_'+id).remove();
+        }
+
+        getCategorias();
+
+    </script>
+{% endblock %}

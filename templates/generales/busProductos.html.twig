@@ -1,0 +1,103 @@
+{% set matRep = materialReparacion ?? 0 %}
+
+<input type="text" id="buscador_productos" placeholder="{{ placeholder ?? 'Productos'}}" onkeyup="buscadorProductos.buscaProductos(this);" value="{{busproductoSelTxt ?? ''}}" autocomplete="off" />
+<img class='imgAgregarProducto' src="{{asset('images/iconos/agregar.svg')}}" alt="Agregar" title="Agregar" onclick="{{callbackCargar}}"/>
+<div class='modalResultadosBuscador' id='modalProductos'>
+    <div class='topModal'>
+        <img src="{{asset('images/iconos/cancelar.svg')}}" alt="Cerrar" title="Cerrar" onclick="buscadorProductos.ocultarBuscadorProductos();"/>
+    </div>
+    <table id='resultadosProductos'></table>
+</div>
+<input type='hidden' id='hiddenProductoId' name='{{nombreCampoProducto}}' value='{{busProductoSel ?? ''}}' />
+
+<script>
+    var buscadorProductos = buscadorProductos || {};
+    buscadorProductos.buscaProductos = function (self){
+        let idAlmacen = document.querySelector('[data-idBuscadorProductos="almacen"]').value;
+        
+        if(idAlmacen == ''){
+            alert('Debe seleccionar un almacén para poder buscar productos.');
+            document.getElementById('buscador_productos').value = '';
+            document.querySelector('[data-idBuscadorProductos="almacen"]').focus();
+            return false;
+        }
+
+        if(self.value.length > 2){
+            let formData = new FormData();
+            formData.append("busqueda", self.value);
+            formData.append("idAlmacen", idAlmacen);
+
+            {% if matRep == 1 %}
+                fetch("{{ path('productos_buscar_material') }}", {
+            {% else %}
+                fetch("{{ path('productos_buscar') }}", {
+            {% endif %}
+                method: 'post',
+                mode: 'cors',
+                credentials: 'same-origin',
+                body: formData
+            }).then(function(response){
+                return response.json();
+            }).then(function(json){
+                buscadorProductos.cargaBuscadorProductos(json);
+                buscadorProductos.mostrarBuscadorProductos();
+            }).catch(function(error){
+                console.log('ERROR:', error);
+            })
+        }else{
+            buscadorProductos.ocultarBuscadorProductos()
+        }
+    }
+
+    buscadorProductos.ocultarBuscadorProductos = function (){
+        document.getElementById('modalProductos').style.display = 'none';
+    }
+
+    buscadorProductos.mostrarBuscadorProductos = function (){
+        document.getElementById('modalProductos').style.display = 'flex';
+    }
+
+    buscadorProductos.cargaBuscadorProductos = function (json){
+        document.getElementById('resultadosProductos').innerHTML = '';
+        if(json.length < 1){
+            document.getElementById('resultadosProductos').innerHTML = '<tr><td>No se encontraron resultados.</td></tr>';
+        }else{
+            json.forEach(function(item, index){
+                let tr = document.createElement('tr');
+
+                {% if esVenta is defined %}
+                    let td0 = document.createElement('td');
+                    let chk0 = document.createElement('input');
+                        chk0.setAttribute('type', "checkbox");
+                        chk0.setAttribute('data-tipochk', "busProductos");
+                        chk0.setAttribute('data-idprod', item.id);
+                    td0.append(chk0);
+                    tr.append(td0);
+                {% else %}
+                    tr.onclick = function(){
+                        txt = '$' + item.precio_venta + ' - ' + item.titulo;
+                        buscadorProductos.cargaProducto(item.id, txt);
+                    }
+                {% endif %}
+                    
+                let td1 = document.createElement('td');
+                    td1.innerHTML = '$' + item.precio_venta;
+                let td2 = document.createElement('td');
+                    td2.innerHTML = item.titulo;
+                let td3 = document.createElement('td');
+                    td3.innerHTML = item.stock + item.corto
+
+                tr.append(td1);
+                tr.append(td2);
+                tr.append(td3);
+                document.getElementById('resultadosProductos').append(tr);
+            });
+        }
+    }
+
+    buscadorProductos.cargaProducto = function (id, txt){
+        document.getElementById('buscador_productos').value=txt;
+        document.getElementById('hiddenProductoId').value=id;
+        buscadorProductos.ocultarBuscadorProductos();
+    }
+</script>

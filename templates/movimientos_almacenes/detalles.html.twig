@@ -1,0 +1,78 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Movimientos entre almacenes{% endblock %}
+
+{% block rutas %}Movimientos entre almacenes > <span>Detalles del movimiento</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('movimientos_almacenes_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Detalles del pedido</h1>
+
+    <form action="#" method="post">
+        <div>
+            <div>
+                <label>Productos solicitados por {{pedido.desde.nombre}}</label>
+                <table class="tablaProductosAsignados">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody id='productosAsignadosPedido'>
+                        {% for p in productosAsignadosPedido %}
+                            <tr>
+                                <td>{{p.titulo}}</td>
+                                <td>{{p.cantidad}} {{p.unidad}}</td>
+                            </tr>
+                        {% endfor %}                
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <label>Productos enviados por {{pedido.hacia.nombre}}</label>
+                <table class="tablaProductosAsignados">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody id='productosAsignadosEnvio'>
+                        {% for p in productosAsignadosEnvio %}
+                            <tr>
+                                <td>{{p.titulo}}</td>
+                                <td>{{p.cantidad}} {{p.unidad}}</td>
+                            </tr>
+                        {% endfor %}                
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <label>Productos recibidos por {{pedido.desde.nombre}}</label>
+                <table class="tablaProductosAsignados">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody id='productosAsignadosEnvio'>
+                        {% for p in productosAsignadosRecepcion %}
+                            <tr>
+                                <td>{{p.titulo}}</td>
+                                <td>{{p.cantidad}} {{p.unidad}}</td>
+                            </tr>
+                        {% endfor %}                
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}

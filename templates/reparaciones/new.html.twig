@@ -1,0 +1,19 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Órdenes de reparación{% endblock %}
+
+{% block rutas %}Órdenes de reparación > <span>Nueva orden de reparación</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('reparaciones_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Nueva orden de reparación</h1>
+
+    <form method="post" action="{{ path('reparaciones_new') }}">
+        {{ include('reparaciones/_ingreso_form.html.twig') }}
+    </form>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'generales/baseSistema.html.twig' %}
+
+{% block title %} - Ventas{% endblock %}
+
+{% block rutas %}Ventas > <span>Nueva venta</span>{% endblock %}
+
+{% block pestanias %}
+    <a href="{{ path('ventas_index') }}" class='btnVolver'>
+        <img src="{{asset('images/iconos/volver.png')}}" alt="" />
+    </a>
+{% endblock %}
+
+{% block contenido %}
+    <h1>Nueva venta</h1>
+
+    <form method="post" action="{{ path('ventas_new') }}" onkeydown="return event.key != 'Enter';" onsubmit="return validaFrmVentas();">
+        {{ include('ventas/_form.html.twig') }}
+    </form>
+
+{% endblock %}
